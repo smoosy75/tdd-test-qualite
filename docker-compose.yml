@@ -1,0 +1,60 @@
+services:
+  #  PocketBase
+  pocketbase:
+    image: spectado/pocketbase:latest
+    container_name: pocketbase
+    ports:
+      - "8090:8090"
+    volumes:
+      - ./pocketbase/pb_data:/pb_data
+      - ./pocketbase/pb_migrations:/pb_migrations
+    command: ["serve", "--http=0.0.0.0:8090"]
+
+  #  Base de données (PostgreSQL)
+  db:
+    image: postgres:15
+    container_name: forum-db
+    environment:
+      POSTGRES_USER: forum
+      POSTGRES_PASSWORD: forum
+      POSTGRES_DB: forum_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  #  Backend (Express + TS)
+  backend:
+    build:
+      context: ./backend
+    container_name: backend
+    command: npm run dev
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgres://forum:forum@db:5432/forum_db
+      POCKETBASE_URL: http://pocketbase:8090
+    depends_on:
+      - db
+      - pocketbase
+    volumes:
+      - ./backend:/app
+
+  # front (React + Vite)
+  frontend:
+    build:
+      context: ./frontend
+    container_name: frontend
+    command: npm run dev
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_PB_URL: http://pocketbase:8090
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+
+# volume pour PostgreSQL
+volumes:
+  db_data:
