@@ -1,0 +1,20 @@
+{
+  "name": "tdd-test-qualite",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://gitlab.com/smoosy75/tdd-test-qualite#readme",
+  "bugs": {
+    "url": "https://gitlab.com/smoosy75/tdd-test-qualite/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://gitlab.com/smoosy75/tdd-test-qualite.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
