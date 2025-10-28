@@ -18,7 +18,7 @@ backend_tests:
     - cd backend
     - npm ci --no-audit --no-fund
   script:
-    - npm test
+    - npm run test:ci
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
