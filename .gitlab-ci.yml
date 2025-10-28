@@ -4,11 +4,6 @@ stages:
 
 variables:
   NODE_ENV: test
-  # DinD essentials:
-  DOCKER_HOST: tcp://docker:2375/
-  DOCKER_DRIVER: overlay2
-  DOCKER_TLS_CERTDIR: "" # disable TLS because we talk on 2375
-  DOCKER_BUILDKIT: "1" # faster, nicer Docker builds
 
 # Backend Tests
 backend_tests:
@@ -39,14 +34,10 @@ frontend_tests:
 # Backend Build (Docker-in-Docker)
 backend_build:
   stage: build
-  image: docker:24.0.7
+  image: docker:24
   services:
-    - name: docker:24.0.7-dind
-      alias: docker
-      command: ["--mtu=1460", "--tls=false"] # "--tls=false" matches the DOCKER_TLS_CERTDIR=""
+    - name: docker:24-dind
   script:
-    - docker version
-    - docker info
     - docker build -t backend:$(echo "$CI_COMMIT_SHORT_SHA") ./backend
     # If we want to push to GitLab Container Registry, uncomment:
     # - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
