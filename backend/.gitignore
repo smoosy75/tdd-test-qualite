@@ -1,1 +1,78 @@
+# -------------------------
+# Node / Front / Backend
+# ------------------------
 node_modules/
+dist/
+dist-ssr/
+build/
+*.local
+.env
+.env.local
+.env.development
+.env.production
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# -------------------------
+# PocketBase
+# -------------------------
+pocketbase/pb_data/
+pocketbase/pb_migrations/
+pocketbase/pb_hooks/
+pocketbase/pb_config.json
+pb_data/
+pb_migrations/
+pb_hooks/
+
+# -------------------------
+# Coverage / Tests / Reports
+# -------------------------
+coverage/
+tests-report/
+*.lcov
+jest-html-reporters-*
+*.seed
+*.tmp
+
+# -------------------------
+# Build / Cache
+# -------------------------
+.cache/
+.vite/
+.temp/
+.tmp/
+*.pid
+*.sqlite
+*.db
+
+# -------------------------
+# Docker / Containers
+# -------------------------
+*.pid
+*.seed
+*.tmp
+*.sqlite
+*.db
+*.tar
+.docker/
+docker-compose.override.yml
+
+# -------------------------
+# IDE / OS files
+# -------------------------
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
