@@ -16,6 +16,7 @@ backend_tests:
     - npm test
   only:
     - main
+    - dev
     - merge_requests
 
 # Backend Build
@@ -28,4 +29,5 @@ backend_build:
     - docker build -t backend ./backend
   only:
     - main
+    - dev
     - merge_requests
