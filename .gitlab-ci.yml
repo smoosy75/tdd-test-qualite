@@ -4,6 +4,11 @@ stages:
 
 variables:
   NODE_ENV: test
+  # DinD essentials:
+  DOCKER_HOST: tcp://docker:2375/
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: "" # disable TLS because we talk on 2375
+  DOCKER_BUILDKIT: "1" # faster, nicer Docker builds
 
 # Backend Tests
 backend_tests:
@@ -11,22 +16,29 @@ backend_tests:
   image: node:20-alpine
   before_script:
     - cd backend
-    - npm install
+    - npm ci --no-audit --no-fund
   script:
     - npm test
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-  privileged: true
 
-# Backend Build
+# Backend Build (Docker-in-Docker)
 backend_build:
   stage: build
-  image: docker:24
+  image: docker:24.0.7
   services:
-    - docker:24-dind
+    - name: docker:24.0.7-dind
+      alias: docker
+      command: ["--mtu=1460", "--tls=false"] # "--tls=false" matches the DOCKER_TLS_CERTDIR=""
   script:
-    - docker build -t backend ./backend
+    - docker version
+    - docker info
+    - docker build -t backend:$(echo "$CI_COMMIT_SHORT_SHA") ./backend
+    # If we want to push to GitLab Container Registry, uncomment:
+    # - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+    # - docker tag backend:$(echo "$CI_COMMIT_SHORT_SHA") "$CI_REGISTRY_IMAGE:$(echo "$CI_COMMIT_SHORT_SHA")"
+    # - docker push "$CI_REGISTRY_IMAGE:$(echo "$CI_COMMIT_SHORT_SHA")"
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
