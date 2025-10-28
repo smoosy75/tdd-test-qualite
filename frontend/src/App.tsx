@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Routes, Route } from "react-router-dom";
 
 import LoginPage from "@/pages/loginPage.tsx";
+import ProfilePage from "./pages/profilPage.tsx/profilPage";
 
 function App() {
   const [status, setStatus] = useState("checking...");
@@ -20,6 +21,7 @@ function App() {
 
       <Routes>
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
       </Routes>
     </div>
   );
