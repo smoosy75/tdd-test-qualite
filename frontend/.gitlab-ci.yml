@@ -30,9 +30,12 @@ frontend_tests:
     - npm install
   script:
     - npm run test
-  only:
-    - main
-    - merge_requests
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+      branches:
+        - main
+        - dev
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
 # Backend Build
 backend_build:
@@ -57,6 +60,9 @@ frontend_build:
     - docker:24-dind
   script:
     - docker build -t frontend ./frontend
-  only:
-    - main
-    - merge_requests
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+      branches:
+        - main
+        - dev
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
