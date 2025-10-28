@@ -21,6 +21,19 @@ backend_tests:
         - dev
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
+# Frontend Tests
+frontend_tests:
+  stage: test
+  image: node:20-alpine
+  before_script:
+    - cd frontend
+    - npm install
+  script:
+    - npm run test
+  only:
+    - main
+    - merge_requests
+
 # Backend Build
 backend_build:
   stage: build
@@ -35,3 +48,15 @@ backend_build:
         - main
         - dev
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+
+# Frontend Build
+frontend_build:
+  stage: build
+  image: docker:24
+  services:
+    - docker:24-dind
+  script:
+    - docker build -t frontend ./frontend
+  only:
+    - main
+    - merge_requests
