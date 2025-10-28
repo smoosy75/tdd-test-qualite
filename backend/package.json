@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon src/server.ts",
-    "test": "jest --watchAll --verbose"
+    "test": "jest --ci --verbose"
   },
   "keywords": [],
   "author": "",
