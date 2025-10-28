@@ -23,6 +23,19 @@ backend_tests:
     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
+# Frontend Tests
+frontend_tests:
+  stage: test
+  image: node:20-alpine
+  before_script:
+    - cd frontend
+    - npm ci --no-audit --no-fund
+  script:
+    - npm run test
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+
 # Backend Build (Docker-in-Docker)
 backend_build:
   stage: build
@@ -39,6 +52,18 @@ backend_build:
     # - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
     # - docker tag backend:$(echo "$CI_COMMIT_SHORT_SHA") "$CI_REGISTRY_IMAGE:$(echo "$CI_COMMIT_SHORT_SHA")"
     # - docker push "$CI_REGISTRY_IMAGE:$(echo "$CI_COMMIT_SHORT_SHA")"
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+
+# Frontend Build
+frontend_build:
+  stage: build
+  image: docker:24
+  services:
+    - docker:24-dind
+  script:
+    - docker build -t frontend ./frontend
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
