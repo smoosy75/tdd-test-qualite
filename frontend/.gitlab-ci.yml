@@ -15,10 +15,7 @@ backend_tests:
   script:
     - npm test
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "push"'
-      branches:
-        - main
-        - dev
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
 # Frontend Tests
@@ -31,10 +28,7 @@ frontend_tests:
   script:
     - npm run test
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "push"'
-      branches:
-        - main
-        - dev
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
 # Backend Build
@@ -46,10 +40,7 @@ backend_build:
   script:
     - docker build -t backend ./backend
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "push"'
-      branches:
-        - main
-        - dev
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
 # Frontend Build
@@ -61,8 +52,5 @@ frontend_build:
   script:
     - docker build -t frontend ./frontend
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "push"'
-      branches:
-        - main
-        - dev
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
