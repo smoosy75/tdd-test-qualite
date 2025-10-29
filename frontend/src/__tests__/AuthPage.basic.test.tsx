@@ -141,4 +141,47 @@ describe("AuthPage - tests front sans backend", () => {
     });
   });
 
+  test("login réussi -> on écrit bien dans le localStorage le token et le user", async () => {
+    render(<AuthPage />);
+
+    // remplir login
+    fireEvent.change(screen.getByLabelText(/email ou pseudo/i), {
+      target: { value: "user1@test.com" },
+    });
+    fireEvent.change(screen.getByLabelText(/mot de passe/i), {
+      target: { value: "Password123!" },
+    });
+
+    // mock fetch pour /auth/login -> succès
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        token: "abc123",
+        user: { id: "u1", username: "user1" },
+      }),
+    });
+
+    // submit form login
+    fireEvent.submit(
+      screen.getByRole("button", { name: /se connecter/i }).closest("form")!
+    );
+
+    await waitFor(() => {
+      // vérifie que localStorage.setItem a été appelé correctement
+      expect(localStorageSetItemSpy).toHaveBeenCalledWith(
+        "authToken",
+        "abc123"
+      );
+      expect(localStorageSetItemSpy).toHaveBeenCalledWith(
+        "currentUser",
+        JSON.stringify({ id: "u1", username: "user1" })
+      );
+    });
+
+    // bonus: message de succès affiché
+    expect(
+      screen.getByText(/connecté avec succès/i)
+    ).toBeInTheDocument();
+  });
+
 });
