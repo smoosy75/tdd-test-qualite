@@ -25,15 +25,17 @@ describe("AuthPage - tests front sans backend", () => {
     ).toBeInTheDocument();
   });
  
-  test("par défaut on est sur Connexion: les champs login sont visibles", () => {
+  test("par défaut on est sur Connexion: les champs login sont visibles et pas ceux d'inscription", () => {
     render(<AuthPage />);
 
-    // Champs du mode login
+    // champs du login visibles
     expect(screen.getByLabelText(/email ou pseudo/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/mot de passe/i)).toBeInTheDocument();
 
-    // Champ 'Pseudo' (inscription) NE DOIT PAS être là
-    expect(screen.queryByLabelText(/pseudo/i)).not.toBeInTheDocument();
+    // champs spécifiques à l'inscription NE sont PAS là
+    // (ex: 'Email' du signup et 'Pseudo' du signup)
+    expect(screen.queryByLabelText(/^email$/i)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/^pseudo$/i)).not.toBeInTheDocument();
   });
 
 
