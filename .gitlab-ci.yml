@@ -84,8 +84,8 @@ sonarqube_backend:
       - .sonar/cache
   script: |
     sonar-scanner \
-      -Dsonar.host.url=https://sonarcloud.io \
-      -Dsonar.login=5aeb7e79b8a03f4847737ec7440606c6763110ba \
+      -Dsonar.host.url="${SONAR_HOST_URL}" \
+      -Dsonar.login="${SONAR_TOKEN}" \
       -Dsonar.projectKey=bardanmi_tdd-and-quality-backend \
       -Dsonar.projectName="tdd&quality_backend" \
       -Dsonar.sources=backend/src \
@@ -111,8 +111,8 @@ sonarqube_frontend:
       - .sonar/cache
   script: |
     sonar-scanner \
-      -Dsonar.host.url=https://sonarcloud.io \
-      -Dsonar.login=5aeb7e79b8a03f4847737ec7440606c6763110ba \
+      -Dsonar.host.url="${SONAR_HOST_URL}" \
+      -Dsonar.login="${SONAR_TOKEN}" \
       -Dsonar.projectKey=bardanmi_tdd-and-quality \
       -Dsonar.projectName="tdd&quality" \
       -Dsonar.sources=frontend/src \
