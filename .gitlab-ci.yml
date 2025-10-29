@@ -95,7 +95,7 @@ sonarqube_backend:
       -Dsonar.typescript.tsconfigPaths=backend/tsconfig.json
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev"'
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/add-sonar-and-lint")'
 
 sonarqube_frontend:
   stage: quality
@@ -122,7 +122,7 @@ sonarqube_frontend:
       -Dsonar.typescript.tsconfigPaths=frontend/tsconfig.json
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev"'
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/add-sonar-and-lint")'
 
 # ---------- BUILD ----------
 # Backend Build
