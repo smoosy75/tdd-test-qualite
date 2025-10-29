@@ -129,6 +129,7 @@ sonarqube_frontend:
       -Dsonar.test.inclusions="**/*.test.*,**/*.spec.*" \
       -Dsonar.javascript.lcov.reportPaths=frontend/coverage/lcov.info \
       -Dsonar.typescript.tsconfigPaths=frontend/tsconfig.json
+      -Dsonar.nodejs.executable="$(which node)"
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/add-sonar-and-lint")'
