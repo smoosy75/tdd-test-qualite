@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import AuthPage from "../pages/loginPage/AuthPage";
 
 const mockFetch = jest.fn();
@@ -45,4 +45,36 @@ describe("AuthPage - tests front sans backend", () => {
 
     expect(screen.queryByLabelText(/email ou pseudo/i)).not.toBeInTheDocument();
   });
+
+  test("si le login échoue (fetch renvoie pas ok), on affiche le message d'erreur", async () => {
+    render(<AuthPage />);
+
+    // on reste en mode login
+
+    // on remplit les champs
+    fireEvent.change(screen.getByLabelText(/email ou pseudo/i), {
+      target: { value: "wrong@test.com" },
+    });
+    fireEvent.change(screen.getByLabelText(/mot de passe/i), {
+      target: { value: "badpass" },
+    });
+
+    // on mock le fetch pour l'appel /auth/login
+    // Le composant attend un .ok === true sinon il throw
+    mockFetch.mockResolvedValueOnce({
+      ok: false,
+      json: async () => ({ message: "Invalid creds" }),
+    });
+
+    // submit
+    fireEvent.submit(screen.getByRole("button", { name: /se connecter/i }).closest("form")!);
+
+    // on attend l'affichage du message d'erreur utilisateur
+    await waitFor(() => {
+      expect(
+        screen.getByText(/email ou mot de passe invalide/i)
+      ).toBeInTheDocument();
+    });
+  });
+
 });
