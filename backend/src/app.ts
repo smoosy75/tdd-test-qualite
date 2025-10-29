@@ -5,9 +5,6 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
-
-app.get("/hello", (_, res) => {
-  res.status(200).json({ status: "ok" });
-});
+app.use(express.urlencoded({ extended: true }));
 
 export default app;
