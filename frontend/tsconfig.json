@@ -6,7 +6,8 @@
     "strict": true,
     "jsx": "react-jsx",
     "skipLibCheck": true,
-
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]
