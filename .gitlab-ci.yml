@@ -106,8 +106,10 @@ sonarqube_frontend:
   variables:
     SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
   before_script:
-    - apk add --no-cache xz
-    - curl -sSLo /tmp/node.tar.xz https://nodejs.org/dist/v20.18.0/node-v20.18.0-linux-musl-x64.tar.xz
+    - apk add --no-cache xz curl
+    - export NODE_VERSION=20.18.0
+    - export NODE_DIST="node-v${NODE_VERSION}-linux-x64-musl"
+    - curl -fsSL "https://nodejs.org/dist/v${NODE_VERSION}/${NODE_DIST}.tar.xz" -o /tmp/node.tar.xz
     - mkdir -p /opt/node
     - xz -dc /tmp/node.tar.xz | tar -x -C /opt/node --strip-components=1
     - export PATH="/opt/node/bin:$PATH"
