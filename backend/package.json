@@ -6,7 +6,10 @@
   "scripts": {
     "dev": "nodemon src/server.ts",
     "test": "jest --watchAll --verbose",
-    "test:ci": "jest --ci --verbose"
+    "test:ci": "jest --ci --verbose --coverage",
+    "lint": "eslint .",
+    "format:check": "prettier --check .",
+    "format:write": "prettier --write ."
   },
   "keywords": [],
   "author": "",
