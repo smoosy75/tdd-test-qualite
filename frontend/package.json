@@ -11,7 +11,7 @@
     "lint": "eslint .",
     "format:check": "prettier --check .",
     "format:write": "prettier --write .",
-    "test:ci": "vitest run --coverage.enabled --coverage.reporter=lcov"
+    "test:ci": "vitest run"
   },
   "dependencies": {
     "pocketbase": "^0.26.3",
@@ -39,6 +39,7 @@
     "vitest": "^3.2.4",
     "prettier": "^3.0.0",
     "eslint-config-prettier": "^9.0.0",
-    "eslint-plugin-prettier": "^5.0.0"
+    "eslint-plugin-prettier": "^5.0.0",
+    "@vitest/coverage-v8": "^3.2.4"
   }
 }
