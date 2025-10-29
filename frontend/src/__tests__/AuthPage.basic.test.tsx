@@ -15,10 +15,8 @@ describe("AuthPage - tests front sans backend", () => {
   test("affiche le titre 'LE FORUM' et les onglets Connexion / Créer un compte", () => {
     render(<AuthPage />);
 
-    // Titre global
     expect(screen.getByText(/LE FORUM/i)).toBeInTheDocument();
 
-    // Les deux boutons du switch
     expect(screen.getByRole("button", { name: /connexion/i })).toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: /créer un compte/i })
@@ -28,15 +26,23 @@ describe("AuthPage - tests front sans backend", () => {
   test("par défaut on est sur Connexion: les champs login sont visibles et pas ceux d'inscription", () => {
     render(<AuthPage />);
 
-    // champs du login visibles
     expect(screen.getByLabelText(/email ou pseudo/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/mot de passe/i)).toBeInTheDocument();
 
-    // champs spécifiques à l'inscription NE sont PAS là
-    // (ex: 'Email' du signup et 'Pseudo' du signup)
+    
     expect(screen.queryByLabelText(/^email$/i)).not.toBeInTheDocument();
     expect(screen.queryByLabelText(/^pseudo$/i)).not.toBeInTheDocument();
   });
 
+  test("cliquer sur 'Créer un compte' affiche le formulaire d'inscription (email, pseudo, mot de passe)", () => {
+    render(<AuthPage />);
 
+    fireEvent.click(screen.getByRole("button", { name: /créer un compte/i }));
+
+    expect(screen.getByLabelText(/^email$/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/pseudo/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/mot de passe/i)).toBeInTheDocument();
+
+    expect(screen.queryByLabelText(/email ou pseudo/i)).not.toBeInTheDocument();
+  });
 });
