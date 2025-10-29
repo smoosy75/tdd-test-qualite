@@ -16,7 +16,7 @@ type PostItem = {
 
 const MOCK_USER: User = {
   id: "mock-user",
-  username: "Utilisateur de démonstration",
+  username: "user123",
   email: "demo@example.com",
   avatar: "https://placekitten.com/200/200",
 };

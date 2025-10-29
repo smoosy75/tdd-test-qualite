@@ -1,5 +1,11 @@
 // src/pages/ProfilePage/ProfilePage.test.tsx
-import { render, screen, within } from "@testing-library/react";
+import {
+  render,
+  screen,
+  within,
+  fireEvent,
+  waitFor,
+} from "@testing-library/react";
 import { vi } from "vitest";
 import ProfilePage from "./profilPage";
 
@@ -64,4 +70,24 @@ test("affiche la liste 'Mes posts' avec les posts de l’utilisateur", async () 
   expect(posts[0]).toHaveTextContent("Contenu 1");
   expect(posts[1]).toHaveTextContent("Post 2");
   expect(posts[1]).toHaveTextContent("Contenu 2");
+});
+
+test("permet d’éditer le nom d’utilisateur et de sauvegarder", async () => {
+  render(<ProfilePage />);
+
+  const nameDisplay = await screen.findByText("Mustapha");
+  expect(nameDisplay).toBeInTheDocument();
+
+  const editBtn = screen.getByRole("button", { name: /modifier/i });
+  fireEvent.click(editBtn);
+
+  const input = screen.getByDisplayValue("Mustapha");
+  fireEvent.change(input, { target: { value: "Nouvel utilisateur" } });
+
+  const saveBtn = screen.getByRole("button", { name: /sauvegarder/i });
+  fireEvent.click(saveBtn);
+
+  await waitFor(() =>
+    expect(screen.getByText("Nouvel utilisateur")).toBeInTheDocument()
+  );
 });
