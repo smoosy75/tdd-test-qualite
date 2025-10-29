@@ -1,7 +1,6 @@
-import { useState, FormEvent, CSSProperties } from "react";
+import React, { useState, FormEvent, CSSProperties } from "react";
 
-const POCKETBASE_URL = "http://localhost:8090";
-const USERS_COLLECTION = "users";
+const API_URL = "http://localhost:5000"; // <-- ton backend Node
 
 // --- Types ---
 interface SignupData {
@@ -17,49 +16,53 @@ interface LoginData {
 
 interface LoginResponse {
   token: string;
-  record: any;
+  user: any;
 }
 
-// --- API ---
+// --- API APPELLE TON BACK ---
 async function apiSignup(data: SignupData) {
-  const res = await fetch(
-    `${POCKETBASE_URL}/api/collections/${USERS_COLLECTION}/records`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email: data.email,
-        password: data.password,
-        passwordConfirm: data.password,
-        username: data.username,
-      }),
-    }
-  );
+  const res = await fetch(`${API_URL}/auth/signup`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      email: data.email,
+      password: data.password,
+      username: data.username,
+    }),
+  });
+
   if (!res.ok) throw await res.json().catch(() => ({}));
-  return res.json();
+  return res.json(); // { user: {...} } par ex.
 }
 
 async function apiLogin(data: LoginData) {
-  const res = await fetch(
-    `${POCKETBASE_URL}/api/collections/${USERS_COLLECTION}/auth-with-password`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    }
-  );
+  const res = await fetch(`${API_URL}/auth/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      identity: data.identity,
+      password: data.password,
+    }),
+  });
+
   if (!res.ok) throw await res.json().catch(() => ({}));
-  return res.json() as Promise<LoginResponse>;
+  return res.json() as Promise<LoginResponse>; // { token, user }
 }
 
 // --- Component ---
 const AuthPage: React.FC = () => {
   const [mode, setMode] = useState<"login" | "signup">("login");
+
+  // login state
   const [identity, setIdentity] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
+
+  // signup state
   const [signupEmail, setSignupEmail] = useState("");
   const [signupUsername, setSignupUsername] = useState("");
   const [signupPassword, setSignupPassword] = useState("");
+
+  // ui state
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [infoMsg, setInfoMsg] = useState("");
@@ -70,11 +73,19 @@ const AuthPage: React.FC = () => {
     setLoading(true);
     setErrorMsg("");
     setInfoMsg("");
+
     try {
-      const data = await apiLogin({ identity, password: loginPassword });
+      const data = await apiLogin({
+        identity,
+        password: loginPassword,
+      });
+
+      // On stocke ce que renvoie ton backend
       localStorage.setItem("authToken", data.token);
-      localStorage.setItem("currentUser", JSON.stringify(data.record));
+      localStorage.setItem("currentUser", JSON.stringify(data.user));
+
       setInfoMsg("Connecté avec succès !");
+      // Exemple : window.location.href = "/forum";
     } catch {
       setErrorMsg("Email ou mot de passe invalide.");
     } finally {
@@ -87,14 +98,18 @@ const AuthPage: React.FC = () => {
     setLoading(true);
     setErrorMsg("");
     setInfoMsg("");
+
     try {
       await apiSignup({
         email: signupEmail,
         username: signupUsername,
         password: signupPassword,
       });
+
+      // après création du compte => repasser en login
       setMode("login");
       setIdentity(signupEmail);
+      setLoginPassword("");
       setInfoMsg("Compte créé. Vous pouvez vous connecter.");
     } catch {
       setErrorMsg("Erreur lors de la création du compte.");
@@ -103,7 +118,7 @@ const AuthPage: React.FC = () => {
     }
   };
 
-  // --- Styles ---
+   // --- Styles ---
   const pageStyle: CSSProperties = {
     minHeight: "100vh",
     backgroundColor: "#fff",
@@ -209,19 +224,27 @@ const AuthPage: React.FC = () => {
       <h1 style={titleStyle}>LE FORUM</h1>
 
       <div style={cardStyle}>
-        {/* Switch Connexion / Inscription */}
+        {/* Onglets Connexion / Inscription */}
         <div style={toggleContainer}>
           <button
             style={mode === "login" ? activeBtn : inactiveBtn}
             disabled={loading}
-            onClick={() => setMode("login")}
+            onClick={() => {
+              setMode("login");
+              setErrorMsg("");
+              setInfoMsg("");
+            }}
           >
             Connexion
           </button>
           <button
             style={mode === "signup" ? activeBtn : inactiveBtn}
             disabled={loading}
-            onClick={() => setMode("signup")}
+            onClick={() => {
+              setMode("signup");
+              setErrorMsg("");
+              setInfoMsg("");
+            }}
           >
             Créer un compte
           </button>

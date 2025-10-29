@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Routes, Route } from "react-router-dom";
 
-import LoginPage from "@/pages/loginPage.tsx";
+import LoginPage from "@/pages/loginPage";
 function App() {
   const [status, setStatus] = useState("checking...");
 

@@ -2,28 +2,39 @@ import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import AuthPage from "../pages/loginPage/AuthPage";
 
-describe("AuthPage (basique)", () => {
-  test("affiche le titre LE FORUM", () => {
-    render(<AuthPage />);
-    expect(screen.getByText(/LE FORUM/i)).toBeInTheDocument();
-  });
+const mockFetch = jest.fn();
+global.fetch = mockFetch as any;
 
-  test("affiche les deux onglets Connexion et Créer un compte", () => {
+const localStorageSetItemSpy = jest.spyOn(window.localStorage.__proto__, "setItem");
+
+beforeEach(() => {
+  jest.clearAllMocks();
+});
+
+describe("AuthPage - tests front sans backend", () => {
+  test("affiche le titre 'LE FORUM' et les onglets Connexion / Créer un compte", () => {
     render(<AuthPage />);
+
+    // Titre global
+    expect(screen.getByText(/LE FORUM/i)).toBeInTheDocument();
+
+    // Les deux boutons du switch
     expect(screen.getByRole("button", { name: /connexion/i })).toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: /créer un compte/i })
     ).toBeInTheDocument();
   });
-
-  test("switch vers créer un compte affiche le champ Pseudo", () => {
+ 
+  test("par défaut on est sur Connexion: les champs login sont visibles", () => {
     render(<AuthPage />);
 
-    // on clique sur "Créer un compte"
-    const signupBtn = screen.getByRole("button", { name: /créer un compte/i });
-    fireEvent.click(signupBtn);
+    // Champs du mode login
+    expect(screen.getByLabelText(/email ou pseudo/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/mot de passe/i)).toBeInTheDocument();
 
-    // le champ Pseudo doit apparaître
-    expect(screen.getByLabelText(/pseudo/i)).toBeInTheDocument();
+    // Champ 'Pseudo' (inscription) NE DOIT PAS être là
+    expect(screen.queryByLabelText(/pseudo/i)).not.toBeInTheDocument();
   });
+
+
 });
