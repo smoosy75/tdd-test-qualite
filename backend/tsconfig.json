@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     /* === Environnement Node === */
-    "target": "ES2020",
-    "module": "CommonJS",
+    "target": "ES2022",
+    "module": "esnext",
     "moduleResolution": "node",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
@@ -19,6 +19,11 @@
     "sourceMap": true,
     "noImplicitAny": false
   },
+  "ts-node": {  
+    "esm": true,
+    "experimentalSpecifierResolution": "node"
+  },
+  "lib": ["esnext"],
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "dist"]
 }
