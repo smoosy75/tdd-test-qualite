@@ -102,5 +102,43 @@ describe("AuthPage - tests front sans backend", () => {
     });
   });
 
+  test("signup réussi -> repasse en mode login, préremplit l'email et affiche le message de succès", async () => {
+    render(<AuthPage />);
+
+    fireEvent.click(screen.getByRole("button", { name: /créer un compte/i }));
+
+    fireEvent.change(screen.getByLabelText(/^email$/i), {
+      target: { value: "cool@user.com" },
+    });
+    fireEvent.change(screen.getByLabelText(/pseudo/i), {
+      target: { value: "cooluser" },
+    });
+    fireEvent.change(screen.getByLabelText(/^mot de passe$/i), {
+      target: { value: "StrongPass123!" },
+    });
+
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ user: { id: "u1", username: "cooluser" } }),
+    });
+
+    fireEvent.submit(
+      screen.getByRole("button", { name: /créer mon compte/i }).closest("form")!
+    );
+
+
+
+    await waitFor(() => {
+      expect(screen.getByLabelText(/email ou pseudo/i)).toBeInTheDocument();
+
+      expect(
+        screen.getByLabelText(/email ou pseudo/i) as HTMLInputElement
+      ).toHaveValue("cool@user.com");
+
+      expect(
+        screen.getByText(/compte créé\. vous pouvez vous connecter\./i)
+      ).toBeInTheDocument();
+    });
+  });
 
 });
