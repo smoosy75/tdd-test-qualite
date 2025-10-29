@@ -1,10 +1,40 @@
 stages:
+  - lint
   - test
+  - quality
   - build
 
 variables:
   NODE_ENV: test
 
+# ---------- LINT / FORMAT ----------
+backend_lint_format:
+  stage: lint
+  image: node:20-alpine
+  before_script:
+    - cd backend
+    - npm ci --no-audit --no-fund
+  script:
+    - npm run lint
+    - npm run format:check
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/add-sonar-and-lint")'
+
+frontend_lint_format:
+  stage: lint
+  image: node:20-alpine
+  before_script:
+    - cd frontend
+    - npm ci --no-audit --no-fund
+  script:
+    - npm run lint
+    - npm run format:check
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/add-sonar-and-lint")'
+
+# ---------- TESTS (produce lcov for Sonar) ----------
 # Backend Tests
 backend_tests:
   stage: test
@@ -14,8 +44,12 @@ backend_tests:
     - npm ci --no-audit --no-fund
   script:
     - npm run test:ci
+  artifacts:
+    when: always
+    paths:
+      - backend/coverage/lcov.info
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/add-sonar-and-lint")'
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
 # Frontend Tests
@@ -26,12 +60,72 @@ frontend_tests:
     - cd frontend
     - npm ci --no-audit --no-fund
   script:
-    - npm run test
+    - npm run test:ci
+  artifacts:
+    when: always
+    paths:
+      - frontend/coverage/lcov.info
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/add-sonar-and-lint")'
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
-# Backend Build (Docker-in-Docker)
+# ---------- SONARQUBE ANALYSIS ----------
+sonarqube_backend:
+  stage: quality
+  image:
+    name: sonarsource/sonar-scanner-cli:latest
+    entrypoint: [""]
+  needs: ["backend_tests"]
+  variables:
+    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
+  cache:
+    key: "${CI_JOB_NAME}"
+    paths:
+      - .sonar/cache
+  script: |
+    sonar-scanner \
+      -Dsonar.host.url="$SONAR_HOST_URL" \
+      -Dsonar.login="$SONAR_TOKEN" \
+      -Dsonar.projectKey="$SONAR_PROJECT_KEY_BACKEND" \
+      -Dsonar.projectName="Backend" \
+      -Dsonar.sources=backend/src \
+      -Dsonar.tests=backend/src \
+      -Dsonar.test.inclusions="**/*.test.*,**/*.spec.*" \
+      -Dsonar.javascript.lcov.reportPaths=backend/coverage/lcov.info \
+      -Dsonar.typescript.tsconfigPaths=backend/tsconfig.json
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev"'
+
+sonarqube_frontend:
+  stage: quality
+  image:
+    name: sonarsource/sonar-scanner-cli:latest
+    entrypoint: [""]
+  needs: ["frontend_tests"]
+  variables:
+    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
+  cache:
+    key: "${CI_JOB_NAME}"
+    paths:
+      - .sonar/cache
+  script: |
+    sonar-scanner \
+      -Dsonar.host.url="$SONAR_HOST_URL" \
+      -Dsonar.login="$SONAR_TOKEN" \
+      -Dsonar.projectKey="$SONAR_PROJECT_KEY_FRONTEND" \
+      -Dsonar.projectName="Frontend" \
+      -Dsonar.sources=frontend/src \
+      -Dsonar.tests=frontend/src \
+      -Dsonar.test.inclusions="**/*.test.*,**/*.spec.*" \
+      -Dsonar.javascript.lcov.reportPaths=frontend/coverage/lcov.info \
+      -Dsonar.typescript.tsconfigPaths=frontend/tsconfig.json
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev"'
+
+# ---------- BUILD ----------
+# Backend Build
 backend_build:
   stage: build
   image: docker:24
@@ -44,7 +138,7 @@ backend_build:
     # - docker tag backend:$(echo "$CI_COMMIT_SHORT_SHA") "$CI_REGISTRY_IMAGE:$(echo "$CI_COMMIT_SHORT_SHA")"
     # - docker push "$CI_REGISTRY_IMAGE:$(echo "$CI_COMMIT_SHORT_SHA")"
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/add-sonar-and-lint")'
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
 # Frontend Build
@@ -56,5 +150,5 @@ frontend_build:
   script:
     - docker build -t frontend ./frontend
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/add-sonar-and-lint")'
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
