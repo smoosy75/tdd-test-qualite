@@ -7,6 +7,10 @@ function App() {
   return (
     <div style={{ textAlign: "center", marginTop: "30px" }}>
       <Routes>
+        <Route
+          path="/"
+          element={<h1>Bienvenue sur l'application React !</h1>}
+        />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/profile" element={<ProfilePage />} />
       </Routes>

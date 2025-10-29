@@ -1,15 +1,8 @@
+// src/pages/ProfilePage/ProfilePage.test.tsx
 import { render, screen, within } from "@testing-library/react";
 import { vi } from "vitest";
+import ProfilePage from "./profilPage";
 
-// isolate component Post
-vi.mock("@/components/Post", () => ({
-  __esModule: true,
-  default: ({ id }: { id: string }) => (
-    <div data-testid="post-item">POST #{id}</div>
-  ),
-}));
-
-// Mock global.fetch
 const mockUser = {
   id: "user_123",
   username: "Mustapha",
@@ -18,12 +11,13 @@ const mockUser = {
 };
 
 const mockPosts = [
-  { id: "p1", title: "Post 1" },
-  { id: "p2", title: "Post 2" },
+  { id: "p1", title: "Post 1", body: "Contenu 1" },
+  { id: "p2", title: "Post 2", body: "Contenu 2" },
 ];
 
 beforeEach(() => {
   let call = 0;
+
   globalThis.fetch = vi.fn((url: RequestInfo) => {
     call++;
     if (call === 1) {
@@ -34,7 +28,7 @@ beforeEach(() => {
       } as Response);
     }
     if (call === 2) {
-      expect(String(url)).toContain("/api/posts?authorId=user_123");
+      expect(String(url)).toContain(`/api/posts?authorId=${mockUser.id}`);
       return Promise.resolve({
         ok: true,
         json: () => Promise.resolve(mockPosts),
@@ -48,26 +42,26 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-import ProfilePage from "./profilPage";
-
 test("affiche avatar, nom et email de l’utilisateur", async () => {
   render(<ProfilePage />);
 
-  // Nom et email
   expect(await screen.findByText("Mustapha")).toBeInTheDocument();
   expect(await screen.findByText("mustapha@example.com")).toBeInTheDocument();
 
-  // Avatar <img src=...>
   const avatar = await screen.findByRole("img", { name: /avatar/i });
   expect(avatar).toHaveAttribute("src", mockUser.avatar);
 });
 
-test('affiche la liste "Mes posts" avec les posts de l’utilisateur', async () => {
+test("affiche la liste 'Mes posts' avec les posts de l’utilisateur", async () => {
   render(<ProfilePage />);
 
   const section = await screen.findByRole("region", { name: /mes posts/i });
-  const items = await within(section).findAllByTestId("post-item");
-  expect(items).toHaveLength(2);
-  expect(items[0]).toHaveTextContent("POST #p1");
-  expect(items[1]).toHaveTextContent("POST #p2");
+
+  const posts = await within(section).findAllByRole("article");
+  expect(posts).toHaveLength(2);
+
+  expect(posts[0]).toHaveTextContent("Post 1");
+  expect(posts[0]).toHaveTextContent("Contenu 1");
+  expect(posts[1]).toHaveTextContent("Post 2");
+  expect(posts[1]).toHaveTextContent("Contenu 2");
 });
