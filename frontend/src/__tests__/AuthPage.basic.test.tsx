@@ -144,7 +144,6 @@ describe("AuthPage - tests front sans backend", () => {
   test("login réussi -> on écrit bien dans le localStorage le token et le user", async () => {
     render(<AuthPage />);
 
-    // remplir login
     fireEvent.change(screen.getByLabelText(/email ou pseudo/i), {
       target: { value: "user1@test.com" },
     });
@@ -152,7 +151,6 @@ describe("AuthPage - tests front sans backend", () => {
       target: { value: "Password123!" },
     });
 
-    // mock fetch pour /auth/login -> succès
     mockFetch.mockResolvedValueOnce({
       ok: true,
       json: async () => ({
@@ -161,13 +159,11 @@ describe("AuthPage - tests front sans backend", () => {
       }),
     });
 
-    // submit form login
     fireEvent.submit(
       screen.getByRole("button", { name: /se connecter/i }).closest("form")!
     );
 
     await waitFor(() => {
-      // vérifie que localStorage.setItem a été appelé correctement
       expect(localStorageSetItemSpy).toHaveBeenCalledWith(
         "authToken",
         "abc123"
@@ -178,10 +174,52 @@ describe("AuthPage - tests front sans backend", () => {
       );
     });
 
-    // bonus: message de succès affiché
     expect(
       screen.getByText(/connecté avec succès/i)
     ).toBeInTheDocument();
   });
+
+  test("le bouton se désactive pendant l'envoi (loading)", async () => {
+  render(<AuthPage />);
+
+  fireEvent.change(screen.getByLabelText(/email ou pseudo/i), {
+    target: { value: "user1@test.com" },
+  });
+  fireEvent.change(screen.getByLabelText(/mot de passe/i), {
+    target: { value: "Password123!" },
+  });
+
+  let resolveRequest: () => void = () => {};
+  const controlledPromise = new Promise<void>((resolve) => {
+    resolveRequest = resolve;
+  });
+
+  mockFetch.mockReturnValueOnce(
+    controlledPromise.then(() => ({
+      ok: true,
+      json: async () => ({
+        token: "zzz",
+        user: { id: "uX", username: "slowUser" },
+      }),
+    }))
+  );
+
+  fireEvent.submit(
+    screen.getByRole("button", { name: /se connecter/i }).closest("form")!
+  );
+
+  const disabledBtn = screen.getByRole("button", {
+    name: /connexion\.\.\./i,
+  });
+  expect(disabledBtn).toBeDisabled();
+
+  resolveRequest();
+
+  await waitFor(() => {
+    expect(localStorageSetItemSpy).toHaveBeenCalled();
+  });
+});
+
+
 
 });
