@@ -72,7 +72,7 @@ test("affiche la liste 'Mes posts' avec les posts de l’utilisateur", async () 
   expect(posts[1]).toHaveTextContent("Contenu 2");
 });
 
-test("permet d’éditer le nom d’utilisateur et de sauvegarder", async () => {
+test("permet d’éditer le nom d’utilisateur et de voir la mise à jour affichée", async () => {
   render(<ProfilePage />);
 
   const nameDisplay = await screen.findByText("Mustapha");
@@ -82,7 +82,10 @@ test("permet d’éditer le nom d’utilisateur et de sauvegarder", async () => 
   fireEvent.click(editBtn);
 
   const input = screen.getByDisplayValue("Mustapha");
+  expect(input).toBeInTheDocument();
+
   fireEvent.change(input, { target: { value: "Nouvel utilisateur" } });
+  expect(input).toHaveValue("Nouvel utilisateur");
 
   const saveBtn = screen.getByRole("button", { name: /sauvegarder/i });
   fireEvent.click(saveBtn);
@@ -90,4 +93,10 @@ test("permet d’éditer le nom d’utilisateur et de sauvegarder", async () => 
   await waitFor(() =>
     expect(screen.getByText("Nouvel utilisateur")).toBeInTheDocument()
   );
+
+  expect(
+    screen.queryByDisplayValue("Nouvel utilisateur")
+  ).not.toBeInTheDocument();
+
+  expect(screen.getByRole("button", { name: /modifier/i })).toBeInTheDocument();
 });
