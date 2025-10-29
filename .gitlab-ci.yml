@@ -100,7 +100,7 @@ sonarqube_backend:
 sonarqube_frontend:
   stage: quality
   image:
-    name: sonarsource/sonar-scanner-cli:latest
+    name: sonarsource/sonar-scanner-cli:5.0.1.3006
     entrypoint: [""]
   needs: ["frontend_tests"]
   variables:
