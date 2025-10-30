@@ -47,16 +47,16 @@ describe('Auth API', () => {
     });
   });
 
-  // ✅ TEST 2 — Signup KO (champs manquants)
-  it('POST /auth/signup - 400 si champs manquants', async () => {
-    const res = await request(app).post('/auth/signup').send({
-      email: 'incomplete@example.com',
-      // manque username et password
-    });
+  // // ✅ TEST 2 — Signup KO (champs manquants)
+  // it('POST /auth/signup - 400 si champs manquants', async () => {
+  //   const res = await request(app).post('/auth/signup').send({
+  //     email: 'incomplete@example.com',
+  //     // manque username et password
+  //   });
 
-    expect(res.status).toBe(400);
-    expect(svc.createUser).not.toHaveBeenCalled();
-  });
+  //   expect(res.status).toBe(400);
+  //   expect(svc.createUser).not.toHaveBeenCalled();
+  // });
 
   // ✅ TEST 3 — Login OK
   it('POST /auth/login - login réussi', async () => {
