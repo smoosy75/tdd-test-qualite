@@ -85,11 +85,6 @@ lighthouse_ci:
   script:
     # Run LHCI against the static build; fail on recommended assertions (checkout lighthouserc.json)
     - lhci autorun
-      --collect.staticDistDir=dist
-      --collect.numberOfRuns=3
-      --collect.settings.chromeFlags="--headless=new --no-sandbox"
-      --upload.target=temporary-public-storage
-      --assert.preset=lighthouse:recommended
   artifacts:
     when: always
     paths:
