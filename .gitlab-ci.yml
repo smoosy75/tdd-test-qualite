@@ -77,32 +77,19 @@ lighthouse_ci:
   before_script:
     - cd frontend
     - npm ci --no-audit --no-fund
-    - npm run build -- --base=/
+    - npm run build # Vite -> dist/
     - npm i -g @lhci/cli
     - apt-get update && apt-get install -y chromium
-    - apt-get update && apt-get install -y jq
     # Tell LHCI which Chrome to use (Debian path)
     - export CHROME_PATH=/usr/bin/chromium
-      # sanity checks on the build output
-    - test -f dist/index.html
-    - '(! grep -q "/src/main.tsx" dist/index.html) || { echo "ERROR: dist/index.html still points to dev entry"; exit 1; }'
-    - 'grep -Eo "/assets/[^\" ]+\\.js" dist/index.html || { echo "ERROR: no /assets/*.js in dist/index.html"; exit 1; }'
   script:
     # Run LHCI against the static build; fail on recommended assertions (checkout lighthouserc.json)
-    #- lhci autorun
-    - lhci collect --verbose || true
-    - ls -l .lighthouseci
-    # show runtimeError and category scores for the *median* run file
-    - |
-      for f in .lighthouseci/*.lhr.json; do
-        echo "---- $f ----"
-        jq -r '{url:.requestedUrl,
-                runtimeError: (.runtimeError.code // "none"),
-                perf: (.categories.performance.score // "null"),
-                a11y: (.categories.accessibility.score // "null")}' "$f" || true
-      done
-    - lhci assert
-    - lhci upload
+    - lhci autorun
+      #--collect.staticDistDir=dist
+      #--collect.numberOfRuns=3
+      #--collect.settings.chromeFlags="--headless=new --no-sandbox"
+      #--upload.target=temporary-public-storage
+      #--assert.preset=lighthouse:recommended
   artifacts:
     when: always
     paths:
