@@ -1,3 +1,5 @@
+/* eslint-env node */
+/* global module */
 module.exports = {
   // On indique à Jest d'utiliser ts-jest pour transpiler TS/JS moderne
   transform: {
