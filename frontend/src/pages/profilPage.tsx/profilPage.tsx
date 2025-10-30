@@ -78,7 +78,11 @@ export default function ProfilePage() {
   }, []);
 
   const handleSave = async () => {
-    if (!user) return;
+    if (!user && !loading) {
+      console.warn("⚠️ Aucun user chargé, utilisation de MOCK_USER par défaut");
+      setUser(MOCK_USER);
+      return null;
+    }
     try {
       const res = await fetch("/api/profile", {
         method: "PUT",
