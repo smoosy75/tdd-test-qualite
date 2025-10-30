@@ -21,7 +21,7 @@ export default async function authGuard(
     }
 
     // stocke l'utilisateur dans req pour usage futur
-    req.user = user;
+    (req as any).user = user;
     next();
   } catch {
     return res.status(401).json({ message: 'Invalid token' });
