@@ -12,6 +12,7 @@ interface LoginResponse {
 }
 
 class PocketbaseService {
+
   /**
    * Crée un utilisateur via l'API PocketBase
    */
@@ -23,7 +24,7 @@ class PocketbaseService {
         email,
         username,
         password,
-        passwordConfirm: password, // obligatoire pour PocketBase
+        passwordConfirm: password, // obligatoire for PocketBase
       }),
     });
 
@@ -66,6 +67,31 @@ class PocketbaseService {
       token: data.token,
       user: data.record,
     };
+  }
+
+  /**
+   * ✅ Valide un token utilisateur via PocketBase REST
+   */
+  async validateToken(token: string) {
+    try {
+      const res = await fetch(
+        `${POCKETBASE_URL}/api/collections/users/auth-refresh`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!res.ok) return null;
+
+      const data = await res.json();
+      return data.record ?? null; // retourne l'utilisateur ou null
+    } catch (err) {
+      return null;
+    }
   }
 }
 

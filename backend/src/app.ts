@@ -1,17 +1,17 @@
 import express, { Application } from "express";
 import authRoutes from "./routes/auth.routes";
 import cors from "cors";
-
+import authGuard from "./middleware/auth.middleware";
 
 
 const app: Application = express();
 
 
 app.use(cors({
-  origin: "http://localhost:5173",    // ton front Vite
+  origin: "http://localhost:5173",
+  credentials: false,
   methods: ["GET","POST","PUT","PATCH","DELETE","OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true,                   // utile si tu utilises des cookies
+  allowedHeaders: ["Content-Type", "Authorization"], // 👈
 }));
 
 app.use(express.json());                 // 👈 indispensable
@@ -29,17 +29,10 @@ app.get("/auth/debug-routes", (req, res) => {
   res.json({ alive: true });
 });
 
-// 🔥 test POST direct sans passer par auth.routes.ts
-app.post("/auth/signup-direct", (req, res) => {
-  console.log("🔥 /auth/signup-direct hit with body:", req.body);
-  res.status(201).json({
-    user: {
-      id: "temp-123",
-      email: req.body.email,
-      username: req.body.username
-    }
-  });
+app.get("/me", authGuard, (req, res) => {
+  res.json({ user: (req as any).user });
 });
+
 
 // 404 à la fin seulement
 app.use((req, res) => {

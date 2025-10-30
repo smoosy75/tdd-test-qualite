@@ -1,6 +1,7 @@
-import React, { useState, FormEvent, CSSProperties } from "react";
+import React, { useState, FormEvent, CSSProperties, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
-const API_URL = "http://localhost:5000"; // <-- ton backend Node
+const API_URL = "http://localhost:3000"; // backend
 
 // --- Types ---
 interface SignupData {
@@ -19,7 +20,7 @@ interface LoginResponse {
   user: any;
 }
 
-// --- API APPELLE TON BACK ---
+// --- API helpers ---
 async function apiSignup(data: SignupData) {
   const res = await fetch(`${API_URL}/auth/signup`, {
     method: "POST",
@@ -30,9 +31,8 @@ async function apiSignup(data: SignupData) {
       username: data.username,
     }),
   });
-
-  if (!res.ok) throw await res.json().catch(() => ({}));
-  return res.json(); // { user: {...} } par ex.
+  if (!res.ok) throw await safeJson(res);
+  return res.json(); // { user: {...} }
 }
 
 async function apiLogin(data: LoginData) {
@@ -44,13 +44,29 @@ async function apiLogin(data: LoginData) {
       password: data.password,
     }),
   });
-
-  if (!res.ok) throw await res.json().catch(() => ({}));
+  if (!res.ok) throw await safeJson(res);
   return res.json() as Promise<LoginResponse>; // { token, user }
+}
+
+async function apiMe(token: string) {
+  const res = await fetch(`${API_URL}/me`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw await safeJson(res);
+  return res.json(); // { user: {...} }
+}
+
+async function safeJson(res: Response) {
+  try {
+    return await res.json();
+  } catch {
+    return { message: res.statusText || "Erreur réseau" };
+  }
 }
 
 // --- Component ---
 const AuthPage: React.FC = () => {
+  const navigate = useNavigate();
   const [mode, setMode] = useState<"login" | "signup">("login");
 
   // login state
@@ -67,6 +83,23 @@ const AuthPage: React.FC = () => {
   const [errorMsg, setErrorMsg] = useState("");
   const [infoMsg, setInfoMsg] = useState("");
 
+  // ✅ Si déjà connecté → on valide le token et on redirige vers /home
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    (async () => {
+      try {
+        await apiMe(token);
+        navigate("/home");
+      } catch {
+        // token invalide → on nettoie
+        localStorage.removeItem("token");
+        localStorage.removeItem("currentUser");
+      }
+    })();
+  }, [navigate]);
+
   // --- Handlers ---
   const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
@@ -75,19 +108,16 @@ const AuthPage: React.FC = () => {
     setInfoMsg("");
 
     try {
-      const data = await apiLogin({
-        identity,
-        password: loginPassword,
-      });
+      const data = await apiLogin({ identity, password: loginPassword });
 
-      // On stocke ce que renvoie ton backend
-      localStorage.setItem("authToken", data.token);
+      // ✅ stocker token pour Option A
+      localStorage.setItem("token", data.token);
       localStorage.setItem("currentUser", JSON.stringify(data.user));
 
       setInfoMsg("Connecté avec succès !");
-      // Exemple : window.location.href = "/forum";
-    } catch {
-      setErrorMsg("Email ou mot de passe invalide.");
+      navigate("/home");
+    } catch (err: any) {
+      setErrorMsg(err?.message || "Email ou mot de passe invalide.");
     } finally {
       setLoading(false);
     }
@@ -106,19 +136,19 @@ const AuthPage: React.FC = () => {
         password: signupPassword,
       });
 
-      // après création du compte => repasser en login
+      // après création du compte → repasser en login prérempli
       setMode("login");
       setIdentity(signupEmail);
       setLoginPassword("");
       setInfoMsg("Compte créé. Vous pouvez vous connecter.");
-    } catch {
-      setErrorMsg("Erreur lors de la création du compte.");
+    } catch (err: any) {
+      setErrorMsg(err?.message || "Erreur lors de la création du compte.");
     } finally {
       setLoading(false);
     }
   };
 
-   // --- Styles ---
+  // --- Styles ---
   const pageStyle: CSSProperties = {
     minHeight: "100vh",
     backgroundColor: "#fff",
