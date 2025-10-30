@@ -92,7 +92,14 @@ lighthouse_ci:
     - lhci collect --verbose || true
     - ls -l .lighthouseci
     # show runtimeError and category scores for the *median* run file
-    - jq '.[0] | {requestedUrl, runtimeError, categories: {perf: .categories.performance.score, a11y: .categories.accessibility.score}}' .lighthouseci/*.lhr.json || true
+    - |
+      for f in .lighthouseci/*.lhr.json; do
+        echo "---- $f ----"
+        jq -r '{url:.requestedUrl,
+                runtimeError: (.runtimeError.code // "none"),
+                perf: (.categories.performance.score // "null"),
+                a11y: (.categories.accessibility.score // "null")}' "$f" || true
+      done
     - lhci assert
     - lhci upload
   artifacts:
