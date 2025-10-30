@@ -35,7 +35,7 @@ deps_vuln_scan:
     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
 
 sast_semgrep:
-  stage: quality
+  stage: security
   image:
     name: returntocorp/semgrep:latest
     entrypoint: [""]
@@ -133,7 +133,7 @@ lighthouse_ci:
 
   # ---------- SONARQUBE ANALYSIS ----------
 sonarqube_backend:
-  stage: performance
+  stage: quality
   image:
     name: sonarsource/sonar-scanner-cli:latest
     entrypoint: [""]
