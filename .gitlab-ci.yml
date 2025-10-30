@@ -3,6 +3,7 @@ default:
     - bardanmi
 
 stages:
+  - security
   - lint
   - test
   - quality
@@ -10,6 +11,39 @@ stages:
 
 variables:
   NODE_ENV: test
+
+# ---------- SECURITY ----------
+secrets_scan:
+  stage: security
+  image:
+    name: zricethezav/gitleaks:latest
+    entrypoint: [""]
+  script: ["gitleaks detect --no-git -v --redact --source ."]
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
+
+deps_vuln_scan:
+  stage: security
+  image:
+    name: aquasec/trivy:latest
+    entrypoint: [""]
+  script:
+    - trivy fs --exit-code 1 --severity HIGH,CRITICAL --ignore-unfixed .
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
+
+sast_semgrep:
+  stage: security
+  image:
+    name: returntocorp/semgrep:latest
+    entrypoint: [""]
+  script:
+    - semgrep ci --config p/ci --metrics=off
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
 
 # ---------- LINT / FORMAT ----------
 backend_lint_format:
