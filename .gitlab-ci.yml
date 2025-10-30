@@ -11,109 +11,110 @@ stages:
 variables:
   NODE_ENV: test
 
-# ---------- LINT / FORMAT ----------
-deps_vuln_scan:
+  # ---------- LINT / FORMAT ----------
+  # secrets_scan:
+  #   stage: lint
+  #   image:
+  #     name: zricethezav/gitleaks:latest
+  #     entrypoint: [""]
+  #   script: ["gitleaks detect --no-git -v --redact --source ."]
+  #   rules:
+  #     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+  #     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
+  # backend_lint_format:
+  #   stage: lint
+  #   image: node:20-alpine
+  #   before_script:
+  #     - cd backend
+  #     - npm ci --no-audit --no-fund
+  #   script:
+  #     - npm run lint
+  #     - npm run format:check
+  #   rules:
+  #     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+  #     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
+
+  # frontend_lint_format:
+  #   stage: lint
+  #   image: node:20-alpine
+  #   before_script:
+  #     - cd frontend
+  #     - npm ci --no-audit --no-fund
+  #   script:
+  #     - npm run lint
+  #     - npm run format:check
+  #   rules:
+  #     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+  #     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
+
+  # # ---------- TESTS (produce lcov for Sonar) ----------
+  # # Backend Tests
+  # backend_tests:
+  #   stage: test
+  #   image: node:20-alpine
+  #   before_script:
+  #     - cd backend
+  #     - npm ci --no-audit --no-fund
+  #   script:
+  #     - npm run test:ci
+  #   artifacts:
+  #     when: always
+  #     paths:
+  #       - backend/coverage/lcov.info
+  #   rules:
+  #     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
+  #     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+
+  # # Frontend Tests
+  # frontend_tests:
+  #   stage: test
+  #   image: node:20-alpine
+  #   before_script:
+  #     - cd frontend
+  #     - npm ci --no-audit --no-fund
+  #   script:
+  #     - npm run test:ci
+  #   artifacts:
+  #     when: always
+  #     paths:
+  #       - frontend/coverage/lcov.info
+  #   rules:
+  #     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
+  #     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+
+  # ---------- DEPENDENCY VULNERABILITY SCAN ----------
+  deps_vuln_scan:
+    stage: quality
+    image: aquasec/trivy:latest
+    script:
+      - trivy fs --exit-code 1 --severity HIGH,CRITICAL --ignore-unfixed .
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
+
+# ---------- LIGHTHOUSE ANALYSIS (perf + a11y + best practices + SEO) ----------
+lighthouse_ci:
   stage: quality
-  image: aquasec/trivy:latest
+  image: node:20-bullseye
+  needs: ["frontend_tests"]
+  before_script:
+    - cd frontend
+    - npm ci --no-audit --no-fund
+    - npm run build # Vite -> dist/
+    - npm i -g @lhci/cli
+    - apt-get update && apt-get install -y chromium
+    # Tell LHCI which Chrome to use (Debian path)
+    - export CHROME_PATH=/usr/bin/chromium
   script:
-    - trivy fs --exit-code 1 --severity HIGH,CRITICAL --ignore-unfixed .
-rules:
-  - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-  - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
-# secrets_scan:
-#   stage: lint
-#   image:
-#     name: zricethezav/gitleaks:latest
-#     entrypoint: [""]
-#   script: ["gitleaks detect --no-git -v --redact --source ."]
-#   rules:
-#     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-#     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
-# backend_lint_format:
-#   stage: lint
-#   image: node:20-alpine
-#   before_script:
-#     - cd backend
-#     - npm ci --no-audit --no-fund
-#   script:
-#     - npm run lint
-#     - npm run format:check
-#   rules:
-#     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-#     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
-
-# frontend_lint_format:
-#   stage: lint
-#   image: node:20-alpine
-#   before_script:
-#     - cd frontend
-#     - npm ci --no-audit --no-fund
-#   script:
-#     - npm run lint
-#     - npm run format:check
-#   rules:
-#     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-#     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
-
-# # ---------- TESTS (produce lcov for Sonar) ----------
-# # Backend Tests
-# backend_tests:
-#   stage: test
-#   image: node:20-alpine
-#   before_script:
-#     - cd backend
-#     - npm ci --no-audit --no-fund
-#   script:
-#     - npm run test:ci
-#   artifacts:
-#     when: always
-#     paths:
-#       - backend/coverage/lcov.info
-#   rules:
-#     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
-#     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-
-# # Frontend Tests
-# frontend_tests:
-#   stage: test
-#   image: node:20-alpine
-#   before_script:
-#     - cd frontend
-#     - npm ci --no-audit --no-fund
-#   script:
-#     - npm run test:ci
-#   artifacts:
-#     when: always
-#     paths:
-#       - frontend/coverage/lcov.info
-#   rules:
-#     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
-#     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-
-# # ---------- LIGHTHOUSE ANALYSIS (perf + a11y + best practices + SEO) ----------
-# lighthouse_ci:
-#   stage: quality
-#   image: node:20-bullseye
-#   needs: ["frontend_tests"]
-#   before_script:
-#     - cd frontend
-#     - npm ci --no-audit --no-fund
-#     - npm run build # Vite -> dist/
-#     - npm i -g @lhci/cli
-#     - apt-get update && apt-get install -y chromium
-#     # Tell LHCI which Chrome to use (Debian path)
-#     - export CHROME_PATH=/usr/bin/chromium
-#   script:
-#     # Run LHCI against the static build; fail on recommended assertions (checkout lighthouserc.json)
-#     - lhci autorun
-#   artifacts:
-#     when: always
-#     paths:
-#       - frontend/.lighthouseci
-#   rules:
-#     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-#     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
-
+    # Run LHCI against the static build; fail on recommended assertions (checkout lighthouserc.json)
+    - lhci autorun
+  artifacts:
+    when: always
+    paths:
+      - frontend/.lighthouseci
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
 # # ---------- SONARQUBE ANALYSIS ----------
 # sonarqube_backend:
 #   stage: performance
