@@ -3,16 +3,23 @@ default:
     - bardanmi
 
 stages:
-  #- lint
-  #- test
-  #- quality
-  - performance
-  #- build
+  - lint
+  - test
+  - quality
+  - build
 
 variables:
   NODE_ENV: test
 
-# ---------- LINT / FORMAT ----------
+---------- LINT / FORMAT ----------
+secrets_scan:
+  stage: lint
+  image: zricethezav/gitleaks:8
+  script: ["gitleaks detect --no-git -v --redact --source ."]
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
+
 # backend_lint_format:
 #   stage: lint
 #   image: node:20-alpine
@@ -159,37 +166,6 @@ variables:
 #     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 #     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'*
 
-# ---------- PERF----------
-k6_load_test:
-  stage: performance
-  image: docker:24
-  services:
-    - name: docker:24-dind
-  variables:
-    DOCKER_HOST: tcp://docker:2375
-    DOCKER_TLS_CERTDIR: ""
-  script:
-    - apk add --no-cache curl jq # for waiting/health
-    # Start only what tests need
-    - docker compose up -d db pocketbase backend
-    # Wait for backend to be ready
-    - |
-      until curl -sSf http://backend:3000/ > /dev/null; do
-        echo "Waiting for backend..." ; sleep 2
-      done
-    # Run k6 in a container on the same compose network
-    - docker compose run --rm \
-      -e API_BASE_URL=http://backend:3000 \
-      -v "$CI_PROJECT_DIR/perf:/scripts:ro" \
-      --no-deps \
-      --entrypoint "" \
-      backend \
-      sh -c "apk add --no-cache curl && \
-      wget -qO- https://github.com/grafana/k6/releases/download/v0.51.0/k6-v0.51.0-linux-amd64.tar.gz | tar xz && \
-      ./k6-v0.51.0-linux-amd64/k6 run /scripts/smoke.js"
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
 # # ---------- BUILD ----------
 # # Backend Build
 # backend_build:
