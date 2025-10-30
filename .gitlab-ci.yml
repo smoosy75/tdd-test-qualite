@@ -77,7 +77,7 @@ lighthouse_ci:
   before_script:
     - cd frontend
     - npm ci --no-audit --no-fund
-    - npm run build
+    - npm run build --base=/
     - npm i -g @lhci/cli
     - apt-get update && apt-get install -y chromium
     # Tell LHCI which Chrome to use (Debian path)
