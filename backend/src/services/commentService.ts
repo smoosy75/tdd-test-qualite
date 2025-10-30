@@ -1,9 +1,15 @@
-import { Page } from "../types";
-import type { Comment } from "../types";
-import { Pool } from "pg";
+import { Page } from '../types';
+import type { Comment } from '../types';
+import { Pool } from 'pg';
 
 export interface ICommentService {
-  getCommentsByPostId(postId: number, page?: number, limit?: number, sortOptions?: SortOptions, filters?: FilterOptions): Promise<Page<Comment>>;
+  getCommentsByPostId(
+    postId: number,
+    page?: number,
+    limit?: number,
+    sortOptions?: SortOptions,
+    filters?: FilterOptions
+  ): Promise<Page<Comment>>;
   getCommentCountByPostId(postId: number): Promise<number>;
 }
 
@@ -27,16 +33,16 @@ export class CommentService implements ICommentService {
     const columnMap: Record<string, string> = {
       createdAt: 'created_at',
       updatedAt: 'updated_at',
-      likes: 'likes'
+      likes: 'likes',
     };
-    
+
     return columnMap[field] || 'created_at';
   }
 
   async getCommentsByPostId(
-    postId: number, 
-    page = 1, 
-    limit = 10, 
+    postId: number,
+    page = 1,
+    limit = 10,
     sortOptions?: SortOptions,
     filters?: FilterOptions
   ): Promise<Page<Comment>> {
@@ -44,7 +50,7 @@ export class CommentService implements ICommentService {
     const client = await this.db.connect();
     const params: any[] = [postId];
     let whereClause = 'WHERE post_id = $1';
-    
+
     try {
       // Add author filter
       if (filters?.authorId) {
@@ -68,7 +74,9 @@ export class CommentService implements ICommentService {
       const totalPages = Math.ceil(total / limit);
 
       // Build sort clause
-      const sortColumn = this.getSortColumn(sortOptions?.sortField || 'createdAt');
+      const sortColumn = this.getSortColumn(
+        sortOptions?.sortField || 'createdAt'
+      );
       const sortOrder = (sortOptions?.sort || 'desc').toUpperCase();
 
       // Add pagination params
@@ -87,20 +95,19 @@ export class CommentService implements ICommentService {
         items: result.rows,
         total,
         page,
-        totalPages
+        totalPages,
       };
     } finally {
       client.release();
     }
   }
 
-    
   async getCommentCountByPostId(postId: number): Promise<number> {
     const result = await this.db.query(
-        `SELECT count(*) as count FROM app.comments 
+      `SELECT count(*) as count FROM app.comments 
          where post_id = $1`,
-        [postId]
-      );
+      [postId]
+    );
 
     return parseInt(result.rows[0].count, 10);
   }

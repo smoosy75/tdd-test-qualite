@@ -19,7 +19,7 @@
     "sourceMap": true,
     "noImplicitAny": false
   },
-  "ts-node": {  
+  "ts-node": {
     "esm": true,
     "experimentalSpecifierResolution": "node"
   },

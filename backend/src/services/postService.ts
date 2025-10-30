@@ -1,11 +1,11 @@
-import { ICommentService } from "./commentService";
-import type { Page, Post } from "../types";
+import { ICommentService } from './commentService';
+import type { Page, Post } from '../types';
 import sanitizeHtml from 'sanitize-html';
-import { Pool } from "pg";
+import { Pool } from 'pg';
 
 export interface IPostService {
-  getPosts(options?: GetPostsOptions): Promise<Page<Post>>
-  getPostById(postId: number, include: string[]): Promise<Post | null>
+  getPosts(options?: GetPostsOptions): Promise<Page<Post>>;
+  getPostById(postId: number, include: string[]): Promise<Post | null>;
 }
 
 export interface GetPostsOptions {
@@ -14,18 +14,19 @@ export interface GetPostsOptions {
   authorId?: number;
   tags?: string[];
   search?: string;
-  sortBy?: "created_at" | "title";
-  sortOrder?: "asc" | "desc";
+  sortBy?: 'created_at' | 'title';
+  sortOrder?: 'asc' | 'desc';
   include?: string[]; // e.g., ['comments', 'author']
-  fields?: string[];  // specific post fields to return
+  fields?: string[]; // specific post fields to return
 }
 
 const MAX_PAGE_SIZE = 50;
 
 export class PostService implements IPostService {
   constructor(
-    private db: Pool, 
-    private commentService: ICommentService) {}
+    private db: Pool,
+    private commentService: ICommentService
+  ) {}
 
   async getPosts(options: GetPostsOptions = {}): Promise<Page<Post>> {
     const page = options.page && options.page > 0 ? options.page : 1;
@@ -35,7 +36,7 @@ export class PostService implements IPostService {
     const client = await this.db.connect();
     try {
       // Build base query
-      let baseQuery = "SELECT * FROM app.posts WHERE 1=1";
+      let baseQuery = 'SELECT * FROM app.posts WHERE 1=1';
       const queryParams: any[] = [];
 
       // Filters
@@ -58,8 +59,8 @@ export class PostService implements IPostService {
       const totalPages = Math.ceil(total / limit);
 
       // Sorting
-      const sortBy = options.sortBy || "created_at";
-      const sortOrder = options.sortOrder === "asc" ? "ASC" : "DESC";
+      const sortBy = options.sortBy || 'created_at';
+      const sortOrder = options.sortOrder === 'asc' ? 'ASC' : 'DESC';
 
       // Fetch posts
       queryParams.push(limit, offset);
@@ -73,7 +74,9 @@ export class PostService implements IPostService {
         postsResult.rows.map(async (post: Post) => {
           const sanitizedContent = sanitizeHtml(post.content);
 
-          let commentCount = await this.commentService.getCommentCountByPostId(post.id);
+          let commentCount = await this.commentService.getCommentCountByPostId(
+            post.id
+          );
 
           // Pick only requested fields if specified
           const postData: Post = {
@@ -99,15 +102,15 @@ export class PostService implements IPostService {
         })
       );
 
-      return { 
-        items : posts, 
-        total, 
-        page, 
-        totalPages 
+      return {
+        items: posts,
+        total,
+        page,
+        totalPages,
       };
     } catch (err) {
-      console.error("Error fetching posts:", err);
-      throw new Error("Database error");
+      console.error('Error fetching posts:', err);
+      throw new Error('Database error');
     } finally {
       client.release();
     }
@@ -116,17 +119,25 @@ export class PostService implements IPostService {
   /**
    * Fetch a single post by ID, optionally including comments
    */
-  async getPostById(postId: number, include: string[] = []): Promise<Post | null> {
+  async getPostById(
+    postId: number,
+    include: string[] = []
+  ): Promise<Post | null> {
     const client = await this.db.connect();
     try {
-      const postResult = await client.query("SELECT * FROM app.posts WHERE id = $1", [postId]);
+      const postResult = await client.query(
+        'SELECT * FROM app.posts WHERE id = $1',
+        [postId]
+      );
       if (!postResult.rowCount) return null;
 
       const post = postResult.rows[0];
 
       const sanitizedContent = sanitizeHtml(post.content);
 
-      let commentCount = await this.commentService.getCommentCountByPostId(post.id);
+      let commentCount = await this.commentService.getCommentCountByPostId(
+        post.id
+      );
 
       return {
         id: post.id,
@@ -140,8 +151,8 @@ export class PostService implements IPostService {
         commentCount,
       };
     } catch (err) {
-      console.error("Error fetching post by ID:", err);
-      throw new Error("Database error");
+      console.error('Error fetching post by ID:', err);
+      throw new Error('Database error');
     } finally {
       client.release();
     }
