@@ -19,7 +19,7 @@ backend_lint_format:
     - npm run format:check
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/improve-ci")'
 
 frontend_lint_format:
   stage: lint
@@ -32,7 +32,7 @@ frontend_lint_format:
     - npm run format:check
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/improve-ci")'
 
 # ---------- TESTS (produce lcov for Sonar) ----------
 # Backend Tests
@@ -49,7 +49,7 @@ backend_tests:
     paths:
       - backend/coverage/lcov.info
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/improve-ci")'
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
 # Frontend Tests
@@ -66,8 +66,37 @@ frontend_tests:
     paths:
       - frontend/coverage/lcov.info
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/improve-ci")'
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+
+# ---------- LIGHTHOUSE ANALYSIS (perf + a11y + best practices + SEO) ----------
+lighthouse_ci:
+  stage: quality
+  image: node:20-bullseye
+  needs: ["frontend_tests"]
+  before_script:
+    - cd frontend
+    - npm ci --no-audit --no-fund
+    - npm run build
+    - npm i -g @lhci/cli
+    - apt-get update && apt-get install -y chromium
+    # Tell LHCI which Chrome to use (Debian path)
+    - export CHROME_PATH=/usr/bin/chromium
+  script:
+    # Run LHCI against the static build; fail on recommended assertions
+    - lhci autorun
+      --collect.staticDistDir=dist
+      --collect.numberOfRuns=3
+      --collect.settings.chromeFlags="--headless=new --no-sandbox"
+      --upload.target=temporary-public-storage
+      --assert.preset=lighthouse:recommended #  we can configure this in a lighthouserc.json
+  artifacts:
+    when: always
+    paths:
+      - frontend/.lighthouseci
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/improve-ci")'
 
 # ---------- SONARQUBE ANALYSIS ----------
 sonarqube_backend:
@@ -95,7 +124,7 @@ sonarqube_backend:
       -Dsonar.typescript.tsconfigPaths=backend/tsconfig.json
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/improve-ci")'
 
 sonarqube_frontend:
   stage: quality
@@ -128,7 +157,7 @@ sonarqube_frontend:
       -Dsonar.typescript.tsconfigPaths=frontend/tsconfig.json*
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/improve-ci")'
 
 # ---------- BUILD ----------
 # Backend Build
@@ -140,7 +169,7 @@ backend_build:
   script:
     - docker build -t backend:$(echo "$CI_COMMIT_SHORT_SHA") ./backend
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/improve-ci")'
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
 # Frontend Build
@@ -152,5 +181,5 @@ frontend_build:
   script:
     - docker build -t frontend ./frontend
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/improve-ci")'
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
