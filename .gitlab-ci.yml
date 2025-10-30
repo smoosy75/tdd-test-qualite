@@ -83,11 +83,11 @@ variables:
   #     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
   # ---------- DEPENDENCY VULNERABILITY SCAN ----------
-  deps_vuln_scan:
-    stage: quality
-    image: aquasec/trivy:latest
-    script:
-      - trivy fs --exit-code 1 --severity HIGH,CRITICAL --ignore-unfixed .
+deps_vuln_scan:
+  stage: quality
+  image: aquasec/trivy:latest
+  script:
+    - trivy fs --exit-code 1 --severity HIGH,CRITICAL --ignore-unfixed .
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
