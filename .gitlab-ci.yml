@@ -12,27 +12,27 @@ stages:
 variables:
   NODE_ENV: test
 
-  # ---------- SECURITY ----------
-  # secrets_scan:
-  #   stage: security
-  #   image:
-  #     name: zricethezav/gitleaks:latest
-  #     entrypoint: [""]
-  #   script: ["gitleaks detect --no-git -v --redact --source ."]
-  #   rules:
-  #     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-  #     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
+# ---------- SECURITY ----------
+secrets_scan:
+  stage: security
+  image:
+    name: zricethezav/gitleaks:latest
+    entrypoint: [""]
+  script: ["gitleaks detect --no-git -v --redact --source ."]
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
 
-# deps_vuln_scan:
-#   stage: security
-#   image:
-#     name: aquasec/trivy:latest
-#     entrypoint: [""]
-#   script:
-#     - trivy fs --exit-code 1 --severity HIGH,CRITICAL --ignore-unfixed .
-#   rules:
-#     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-#     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
+deps_vuln_scan:
+  stage: security
+  image:
+    name: aquasec/trivy:latest
+    entrypoint: [""]
+  script:
+    - trivy fs --exit-code 1 --severity HIGH,CRITICAL --ignore-unfixed .
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
 
 sast_semgrep:
   stage: quality
@@ -44,173 +44,175 @@ sast_semgrep:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
+
 # ---------- LINT / FORMAT ----------
-# backend_lint_format:
-#   stage: lint
-#   image: node:20-alpine
-#   before_script:
-#     - cd backend
-#     - npm ci --no-audit --no-fund
-#   script:
-#     - npm run lint
-#     - npm run format:check
-#   rules:
-#     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-#     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
+backend_lint_format:
+  stage: lint
+  image: node:20-alpine
+  before_script:
+    - cd backend
+    - npm ci --no-audit --no-fund
+  script:
+    - npm run lint
+    - npm run format:check
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
 
-# frontend_lint_format:
-#   stage: lint
-#   image: node:20-alpine
-#   before_script:
-#     - cd frontend
-#     - npm ci --no-audit --no-fund
-#   script:
-#     - npm run lint
-#     - npm run format:check
-#   rules:
-#     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-#     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
+frontend_lint_format:
+  stage: lint
+  image: node:20-alpine
+  before_script:
+    - cd frontend
+    - npm ci --no-audit --no-fund
+  script:
+    - npm run lint
+    - npm run format:check
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
 
-# # ---------- TESTS (produce lcov for Sonar) ----------
-# # Backend Tests
-# backend_tests:
-#   stage: test
-#   image: node:20-alpine
-#   before_script:
-#     - cd backend
-#     - npm ci --no-audit --no-fund
-#   script:
-#     - npm run test:ci
-#   artifacts:
-#     when: always
-#     paths:
-#       - backend/coverage/lcov.info
-#   rules:
-#     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
-#     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+# ---------- TESTS (produce lcov for Sonar) ----------
+# Backend Tests
+backend_tests:
+  stage: test
+  image: node:20-alpine
+  before_script:
+    - cd backend
+    - npm ci --no-audit --no-fund
+  script:
+    - npm run test:ci
+  artifacts:
+    when: always
+    paths:
+      - backend/coverage/lcov.info
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
-# # Frontend Tests
-# frontend_tests:
-#   stage: test
-#   image: node:20-alpine
-#   before_script:
-#     - cd frontend
-#     - npm ci --no-audit --no-fund
-#   script:
-#     - npm run test:ci
-#   artifacts:
-#     when: always
-#     paths:
-#       - frontend/coverage/lcov.info
-#   rules:
-#     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
-#     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+# Frontend Tests
+frontend_tests:
+  stage: test
+  image: node:20-alpine
+  before_script:
+    - cd frontend
+    - npm ci --no-audit --no-fund
+  script:
+    - npm run test:ci
+  artifacts:
+    when: always
+    paths:
+      - frontend/coverage/lcov.info
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
 # ---------- LIGHTHOUSE ANALYSIS (perf + a11y + best practices + SEO) ----------
-# lighthouse_ci:
-#   stage: quality
-#   image: node:20-bullseye
-#   needs: ["frontend_tests"]
-#   before_script:
-#     - cd frontend
-#     - npm ci --no-audit --no-fund
-#     - npm run build # Vite -> dist/
-#     - npm i -g @lhci/cli
-#     - apt-get update && apt-get install -y chromium
-#     # Tell LHCI which Chrome to use (Debian path)
-#     - export CHROME_PATH=/usr/bin/chromium
-#   script:
-#     # Run LHCI against the static build; fail on recommended assertions (checkout lighthouserc.json)
-#     - lhci autorun
-#   artifacts:
-#     when: always
-#     paths:
-#       - frontend/.lighthouseci
-#   rules:
-#     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-#     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
-# # ---------- SONARQUBE ANALYSIS ----------
-# sonarqube_backend:
-#   stage: performance
-#   image:
-#     name: sonarsource/sonar-scanner-cli:latest
-#     entrypoint: [""]
-#   needs: ["backend_tests"]
-#   variables:
-#     SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
-#   cache:
-#     key: "${CI_JOB_NAME}"
-#     paths:
-#       - .sonar/cache
-#   script: |
-#     sonar-scanner \
-#       -Dsonar.host.url="${SONAR_HOST_URL}" \
-#       -Dsonar.login="${SONAR_TOKEN}" \
-#       -Dsonar.projectKey="${PROJECT_KEY_BACKEND}" \
-#       -Dsonar.projectName="${PROJECT_NAME_BACKEND}" \
-#       -Dsonar.sources=backend/src \
-#       -Dsonar.tests=backend/src \
-#       -Dsonar.test.inclusions="**/*.test.*,**/*.spec.*" \
-#       -Dsonar.javascript.lcov.reportPaths=backend/coverage/lcov.info \
-#       -Dsonar.typescript.tsconfigPaths=backend/tsconfig.json
-#   rules:
-#     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-#     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
+lighthouse_ci:
+  stage: quality
+  image: node:20-bullseye
+  needs: ["frontend_tests"]
+  before_script:
+    - cd frontend
+    - npm ci --no-audit --no-fund
+    - npm run build # Vite -> dist/
+    - npm i -g @lhci/cli
+    - apt-get update && apt-get install -y chromium
+    # Tell LHCI which Chrome to use (Debian path)
+    - export CHROME_PATH=/usr/bin/chromium
+  script:
+    # Run LHCI against the static build; fail on recommended assertions (checkout lighthouserc.json)
+    - lhci autorun
+  artifacts:
+    when: always
+    paths:
+      - frontend/.lighthouseci
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
 
-# sonarqube_frontend:
-#   stage: quality
-#   image:
-#     name: node:20-bullseye
-#     entrypoint: [""]
-#   needs: ["frontend_tests"]
-#   variables:
-#     SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
-#   before_script:
-#     - apt-get update && apt-get install -y curl unzip
-#     - curl -fsSL -o /tmp/scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip
-#     - unzip -q /tmp/scanner.zip -d /opt
-#     - export PATH="/opt/sonar-scanner-5.0.1.3006-linux/bin:$PATH"
-#     - node -v
-#   cache:
-#     key: "${CI_JOB_NAME}"
-#     paths:
-#       - .sonar/cache
-#   script: |
-#     sonar-scanner \
-#       -Dsonar.host.url="${SONAR_HOST_URL}" \
-#       -Dsonar.login="${SONAR_TOKEN}" \
-#       -Dsonar.projectKey="${PROJECT_KEY_FRONTEND}" \
-#       -Dsonar.projectName="${PROJECT_NAME_FRONTEND}" \
-#       -Dsonar.sources=frontend/src \
-#       -Dsonar.tests=frontend/src \
-#       -Dsonar.test.inclusions="**/*.test.*,**/*.spec.*" \
-#       -Dsonar.javascript.lcov.reportPaths=frontend/coverage/lcov.info \
-#       -Dsonar.typescript.tsconfigPaths=frontend/tsconfig.json*
-#   rules:
-#     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-#     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'*
+ # ---------- SONARQUBE ANALYSIS ----------
+sonarqube_backend:
+  stage: performance
+  image:
+    name: sonarsource/sonar-scanner-cli:latest
+    entrypoint: [""]
+  needs: ["backend_tests"]
+  variables:
+    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
+  cache:
+    key: "${CI_JOB_NAME}"
+    paths:
+      - .sonar/cache
+  script: |
+    sonar-scanner \
+      -Dsonar.host.url="${SONAR_HOST_URL}" \
+      -Dsonar.login="${SONAR_TOKEN}" \
+      -Dsonar.projectKey="${PROJECT_KEY_BACKEND}" \
+      -Dsonar.projectName="${PROJECT_NAME_BACKEND}" \
+      -Dsonar.sources=backend/src \
+      -Dsonar.tests=backend/src \
+      -Dsonar.test.inclusions="**/*.test.*,**/*.spec.*" \
+      -Dsonar.javascript.lcov.reportPaths=backend/coverage/lcov.info \
+      -Dsonar.typescript.tsconfigPaths=backend/tsconfig.json
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
+
+sonarqube_frontend:
+  stage: quality
+  image:
+    name: node:20-bullseye
+    entrypoint: [""]
+  needs: ["frontend_tests"]
+  variables:
+    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
+  before_script:
+    - apt-get update && apt-get install -y curl unzip
+    - curl -fsSL -o /tmp/scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip
+    - unzip -q /tmp/scanner.zip -d /opt
+    - export PATH="/opt/sonar-scanner-5.0.1.3006-linux/bin:$PATH"
+    - node -v
+  cache:
+    key: "${CI_JOB_NAME}"
+    paths:
+      - .sonar/cache
+  script: |
+    sonar-scanner \
+      -Dsonar.host.url="${SONAR_HOST_URL}" \
+      -Dsonar.login="${SONAR_TOKEN}" \
+      -Dsonar.projectKey="${PROJECT_KEY_FRONTEND}" \
+      -Dsonar.projectName="${PROJECT_NAME_FRONTEND}" \
+      -Dsonar.sources=frontend/src \
+      -Dsonar.tests=frontend/src \
+      -Dsonar.test.inclusions="**/*.test.*,**/*.spec.*" \
+      -Dsonar.javascript.lcov.reportPaths=frontend/coverage/lcov.info \
+      -Dsonar.typescript.tsconfigPaths=frontend/tsconfig.json*
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'*
 
 # # ---------- BUILD ----------
-# # Backend Build
-# backend_build:
-#   stage: build
-#   image: docker:24
-#   services:
-#     - name: docker:24-dind
-#   script:
-#     - docker build -t backend:$(echo "$CI_COMMIT_SHORT_SHA") ./backend
-#   rules:
-#     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
-#     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+# Backend Build
+backend_build:
+  stage: build
+  image: docker:24
+  services:
+    - name: docker:24-dind
+  script:
+    - docker build -t backend:$(echo "$CI_COMMIT_SHORT_SHA") ./backend
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
 # # Frontend Build
-# frontend_build:
-#   stage: build
-#   image: docker:24
-#   services:
-#     - docker:24-dind
-#   script:
-#     - docker build -t frontend ./frontend
-#   rules:
-#     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
-#     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+frontend_build:
+  stage: build
+  image: docker:24
+  services:
+    - docker:24-dind
+  script:
+    - docker build -t frontend ./frontend
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
