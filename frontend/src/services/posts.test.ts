@@ -1,5 +1,4 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { postsApi, PostsApiError } from './posts';
 
 describe('postsApi', () => {
   beforeEach(() => {

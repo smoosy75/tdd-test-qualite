@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router';
 import PostDetail from '../components/PostDetail';
 import { postsApi } from '../services/posts';
+import { Post } from '@/types';
 
 // Mock the postsApi service
 vi.mock('../services/posts', () => ({
@@ -282,7 +283,9 @@ describe('PostDetail Component', () => {
     });
 
     it('should display "Post not found" when post is null', async () => {
-      vi.mocked(postsApi.getPostById).mockResolvedValue(null as any);
+      vi.mocked(postsApi.getPostById).mockResolvedValue(
+        null as unknown as Post,
+      );
 
       renderPostDetail('1');
 
