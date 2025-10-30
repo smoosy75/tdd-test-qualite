@@ -82,6 +82,11 @@ lighthouse_ci:
     - apt-get update && apt-get install -y chromium
     # Tell LHCI which Chrome to use (Debian path)
     - export CHROME_PATH=/usr/bin/chromium
+      # sanity checks on the build output
+    - test -f dist/index.html
+    - '(! grep -q "/src/main.tsx" dist/index.html) || { echo "ERROR: dist/index.html still points to dev entry"; exit 1; }'
+    - 'grep -Eo "/assets/[^\" ]+\\.js" dist/index.html || { echo "ERROR: no /assets/*.js in dist/index.html"; exit 1; }'
+
   script:
     # Run LHCI against the static build; fail on recommended assertions (checkout lighthouserc.json)
     - lhci autorun
