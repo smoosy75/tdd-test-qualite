@@ -161,7 +161,7 @@ variables:
 
 # ---------- PERF----------
 k6_load:
-  stage: quality
+  stage: performance
   image: grafana/k6:latest
   variables:
     API_BASE_URL: "http://localhost:3000"
