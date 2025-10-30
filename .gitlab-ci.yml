@@ -1,3 +1,7 @@
+default:
+  tags:
+    - bardanmi
+
 stages:
   - lint
   - test
@@ -68,6 +72,30 @@ frontend_tests:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+
+# ---------- LIGHTHOUSE ANALYSIS (perf + a11y + best practices + SEO) ----------
+lighthouse_ci:
+  stage: quality
+  image: node:20-bullseye
+  needs: ["frontend_tests"]
+  before_script:
+    - cd frontend
+    - npm ci --no-audit --no-fund
+    - npm run build # Vite -> dist/
+    - npm i -g @lhci/cli
+    - apt-get update && apt-get install -y chromium
+    # Tell LHCI which Chrome to use (Debian path)
+    - export CHROME_PATH=/usr/bin/chromium
+  script:
+    # Run LHCI against the static build; fail on recommended assertions (checkout lighthouserc.json)
+    - lhci autorun
+  artifacts:
+    when: always
+    paths:
+      - frontend/.lighthouseci
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
 
 # ---------- SONARQUBE ANALYSIS ----------
 sonarqube_backend:
