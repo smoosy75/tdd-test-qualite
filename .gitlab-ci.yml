@@ -80,6 +80,7 @@ lighthouse_ci:
     - npm run build -- --base=/
     - npm i -g @lhci/cli
     - apt-get update && apt-get install -y chromium
+    - apt-get update && apt-get install -y jq
     # Tell LHCI which Chrome to use (Debian path)
     - export CHROME_PATH=/usr/bin/chromium
       # sanity checks on the build output
