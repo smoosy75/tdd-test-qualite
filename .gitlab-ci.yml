@@ -85,7 +85,9 @@ variables:
   # ---------- DEPENDENCY VULNERABILITY SCAN ----------
 deps_vuln_scan:
   stage: quality
-  image: aquasec/trivy:latest
+  image:
+    name: aquasec/trivy:latest
+    entrypoint: [""]
   script:
     - trivy fs --exit-code 1 --severity HIGH,CRITICAL --ignore-unfixed .
   rules:
