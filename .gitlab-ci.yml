@@ -14,7 +14,9 @@ variables:
 # ---------- LINT / FORMAT ----------
 secrets_scan:
   stage: lint
-  image: zricethezav/gitleaks:latest
+  image:
+    name: zricethezav/gitleaks:latest
+    entrypoint: [""]
   script: ["gitleaks detect --no-git -v --redact --source ."]
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
