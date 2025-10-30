@@ -12,15 +12,23 @@ variables:
   NODE_ENV: test
 
 # ---------- LINT / FORMAT ----------
-secrets_scan:
-  stage: lint
-  image:
-    name: zricethezav/gitleaks:latest
-    entrypoint: [""]
-  script: ["gitleaks detect --no-git -v --redact --source ."]
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
+deps_vuln_scan:
+  stage: quality
+  image: aquasec/trivy:latest
+  script:
+    - trivy fs --exit-code 1 --severity HIGH,CRITICAL --ignore-unfixed .
+rules:
+  - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+  - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
+# secrets_scan:
+#   stage: lint
+#   image:
+#     name: zricethezav/gitleaks:latest
+#     entrypoint: [""]
+#   script: ["gitleaks detect --no-git -v --redact --source ."]
+#   rules:
+#     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+#     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
 # backend_lint_format:
 #   stage: lint
 #   image: node:20-alpine
