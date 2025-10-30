@@ -3,6 +3,7 @@ default:
     - bardanmi
 
 stages:
+  - security
   - lint
   - test
   - quality
@@ -11,9 +12,9 @@ stages:
 variables:
   NODE_ENV: test
 
-  # ---------- LINT / FORMAT ----------
+  # ---------- SECURITY ----------
   # secrets_scan:
-  #   stage: lint
+  #   stage: security
   #   image:
   #     name: zricethezav/gitleaks:latest
   #     entrypoint: [""]
@@ -21,78 +22,90 @@ variables:
   #   rules:
   #     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
   #     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
-  # backend_lint_format:
-  #   stage: lint
-  #   image: node:20-alpine
-  #   before_script:
-  #     - cd backend
-  #     - npm ci --no-audit --no-fund
-  #   script:
-  #     - npm run lint
-  #     - npm run format:check
-  #   rules:
-  #     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-  #     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
 
-  # frontend_lint_format:
-  #   stage: lint
-  #   image: node:20-alpine
-  #   before_script:
-  #     - cd frontend
-  #     - npm ci --no-audit --no-fund
-  #   script:
-  #     - npm run lint
-  #     - npm run format:check
-  #   rules:
-  #     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-  #     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
+# deps_vuln_scan:
+#   stage: security
+#   image:
+#     name: aquasec/trivy:latest
+#     entrypoint: [""]
+#   script:
+#     - trivy fs --exit-code 1 --severity HIGH,CRITICAL --ignore-unfixed .
+#   rules:
+#     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+#     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
 
-  # # ---------- TESTS (produce lcov for Sonar) ----------
-  # # Backend Tests
-  # backend_tests:
-  #   stage: test
-  #   image: node:20-alpine
-  #   before_script:
-  #     - cd backend
-  #     - npm ci --no-audit --no-fund
-  #   script:
-  #     - npm run test:ci
-  #   artifacts:
-  #     when: always
-  #     paths:
-  #       - backend/coverage/lcov.info
-  #   rules:
-  #     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
-  #     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-
-  # # Frontend Tests
-  # frontend_tests:
-  #   stage: test
-  #   image: node:20-alpine
-  #   before_script:
-  #     - cd frontend
-  #     - npm ci --no-audit --no-fund
-  #   script:
-  #     - npm run test:ci
-  #   artifacts:
-  #     when: always
-  #     paths:
-  #       - frontend/coverage/lcov.info
-  #   rules:
-  #     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
-  #     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-
-  # ---------- DEPENDENCY VULNERABILITY SCAN ----------
-deps_vuln_scan:
+sast_semgrep:
   stage: quality
   image:
-    name: aquasec/trivy:latest
+    name: returntocorp/semgrep:latest
     entrypoint: [""]
   script:
-    - trivy fs --exit-code 1 --severity HIGH,CRITICAL --ignore-unfixed .
+    - semgrep ci --config p/ci --error --metrics=off
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
+# ---------- LINT / FORMAT ----------
+# backend_lint_format:
+#   stage: lint
+#   image: node:20-alpine
+#   before_script:
+#     - cd backend
+#     - npm ci --no-audit --no-fund
+#   script:
+#     - npm run lint
+#     - npm run format:check
+#   rules:
+#     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+#     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
+
+# frontend_lint_format:
+#   stage: lint
+#   image: node:20-alpine
+#   before_script:
+#     - cd frontend
+#     - npm ci --no-audit --no-fund
+#   script:
+#     - npm run lint
+#     - npm run format:check
+#   rules:
+#     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+#     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
+
+# # ---------- TESTS (produce lcov for Sonar) ----------
+# # Backend Tests
+# backend_tests:
+#   stage: test
+#   image: node:20-alpine
+#   before_script:
+#     - cd backend
+#     - npm ci --no-audit --no-fund
+#   script:
+#     - npm run test:ci
+#   artifacts:
+#     when: always
+#     paths:
+#       - backend/coverage/lcov.info
+#   rules:
+#     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
+#     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+
+# # Frontend Tests
+# frontend_tests:
+#   stage: test
+#   image: node:20-alpine
+#   before_script:
+#     - cd frontend
+#     - npm ci --no-audit --no-fund
+#   script:
+#     - npm run test:ci
+#   artifacts:
+#     when: always
+#     paths:
+#       - frontend/coverage/lcov.info
+#   rules:
+#     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
+#     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+
 # ---------- LIGHTHOUSE ANALYSIS (perf + a11y + best practices + SEO) ----------
 # lighthouse_ci:
 #   stage: quality
