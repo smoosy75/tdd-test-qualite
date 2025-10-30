@@ -2,7 +2,6 @@ import express, { Application } from 'express';
 import authRoutes from './routes/auth.routes';
 import cors from 'cors';
 import authGuard from './middleware/auth.middleware';
-import type { Request, Response, NextFunction } from 'express';
 const app: Application = express();
 
 app.use(

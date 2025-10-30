@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import pocketbaseService from '../services/pocketbase.service';
+import { ErrorWithMessage } from '../types/ErrorWithMessage';
 
 export async function signup(req: Request, res: Response): Promise<Response> {
   const { email, username, password } = req.body;
@@ -23,13 +24,17 @@ export async function signup(req: Request, res: Response): Promise<Response> {
     console.log('✅ /auth/signup SUCCESS', user);
 
     return res.status(201).json({ user });
-  } catch (error: any) {
+  } catch (error) {
+    const e = error as ErrorWithMessage;
+
     console.error('💥 /auth/signup ERROR', {
-      message: error?.message,
-      stack: error?.stack,
+      message: e.message,
+      stack: e.stack,
     });
 
-    return res.status(500).json({ message: error.message || 'Erreur interne' });
+    return res.status(500).json({
+      message: e.message || 'Erreur interne'
+    });
   }
 }
 
@@ -49,18 +54,21 @@ export async function login(req: Request, res: Response): Promise<Response> {
     console.log('✅ /auth/login SUCCESS', result.user);
 
     return res.status(200).json(result);
-  } catch (error: any) {
+  } catch (error) {
+    const e = error as ErrorWithMessage;
+
     console.error('💥 /auth/login ERROR', {
-      message: error?.message,
-      stack: error?.stack,
+      message: e.message,
+      stack: e.stack,
     });
 
-    if (error.message === 'Invalid credentials') {
+    if (e?.message === 'Invalid credentials') {
       return res.status(401).json({ message: 'Identifiants invalides' });
-    } else if (error.message === 'User not found') {
+    }
+    if (e?.message === 'User not found') {
       return res.status(404).json({ message: 'Utilisateur introuvable' });
     }
 
-    return res.status(500).json({ message: 'Erreur interne' });
+    return res.status(500).json({ message: e.message || 'Erreur interne' });
   }
 }
