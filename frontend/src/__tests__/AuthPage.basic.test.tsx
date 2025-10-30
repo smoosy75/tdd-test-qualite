@@ -1,35 +1,39 @@
-import React from "react";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import AuthPage from "../pages/loginPage/AuthPage";
+import React from 'react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import AuthPage from '../pages/loginPage/AuthPage';
 
 const mockFetch = jest.fn();
 global.fetch = mockFetch as any;
 
-const localStorageSetItemSpy = jest.spyOn(window.localStorage.__proto__, "setItem");
+const localStorageSetItemSpy = jest.spyOn(
+  window.localStorage.__proto__,
+  'setItem',
+);
 
 beforeEach(() => {
   jest.clearAllMocks();
 });
 
-describe("AuthPage - tests front sans backend", () => {
+describe('AuthPage - tests front sans backend', () => {
   test("affiche le titre 'LE FORUM' et les onglets Connexion / Créer un compte", () => {
     render(<AuthPage />);
 
     expect(screen.getByText(/LE FORUM/i)).toBeInTheDocument();
 
-    expect(screen.getByRole("button", { name: /connexion/i })).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: /créer un compte/i })
+      screen.getByRole('button', { name: /connexion/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /créer un compte/i }),
     ).toBeInTheDocument();
   });
- 
+
   test("par défaut on est sur Connexion: les champs login sont visibles et pas ceux d'inscription", () => {
     render(<AuthPage />);
 
     expect(screen.getByLabelText(/email ou pseudo/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/mot de passe/i)).toBeInTheDocument();
 
-    
     expect(screen.queryByLabelText(/^email$/i)).not.toBeInTheDocument();
     expect(screen.queryByLabelText(/^pseudo$/i)).not.toBeInTheDocument();
   });
@@ -37,7 +41,7 @@ describe("AuthPage - tests front sans backend", () => {
   test("cliquer sur 'Créer un compte' affiche le formulaire d'inscription (email, pseudo, mot de passe)", () => {
     render(<AuthPage />);
 
-    fireEvent.click(screen.getByRole("button", { name: /créer un compte/i }));
+    fireEvent.click(screen.getByRole('button', { name: /créer un compte/i }));
 
     expect(screen.getByLabelText(/^email$/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/pseudo/i)).toBeInTheDocument();
@@ -49,24 +53,25 @@ describe("AuthPage - tests front sans backend", () => {
   test("si le login échoue (fetch renvoie pas ok), on affiche le message d'erreur", async () => {
     render(<AuthPage />);
 
-
     fireEvent.change(screen.getByLabelText(/email ou pseudo/i), {
-      target: { value: "wrong@test.com" },
+      target: { value: 'wrong@test.com' },
     });
     fireEvent.change(screen.getByLabelText(/mot de passe/i), {
-      target: { value: "badpass" },
+      target: { value: 'badpass' },
     });
 
     mockFetch.mockResolvedValueOnce({
       ok: false,
-      json: async () => ({ message: "Invalid creds" }),
+      json: async () => ({ message: 'Invalid creds' }),
     });
 
-    fireEvent.submit(screen.getByRole("button", { name: /se connecter/i }).closest("form")!);
+    fireEvent.submit(
+      screen.getByRole('button', { name: /se connecter/i }).closest('form')!,
+    );
 
     await waitFor(() => {
       expect(
-        screen.getByText(/email ou mot de passe invalide/i)
+        screen.getByText(/email ou mot de passe invalide/i),
       ).toBeInTheDocument();
     });
   });
@@ -74,30 +79,32 @@ describe("AuthPage - tests front sans backend", () => {
   test("si le signup échoue, on affiche le message d'erreur d'inscription", async () => {
     render(<AuthPage />);
 
-    fireEvent.click(screen.getByRole("button", { name: /créer un compte/i }));
+    fireEvent.click(screen.getByRole('button', { name: /créer un compte/i }));
 
     fireEvent.change(screen.getByLabelText(/^email$/i), {
-      target: { value: "new@user.com" },
+      target: { value: 'new@user.com' },
     });
     fireEvent.change(screen.getByLabelText(/pseudo/i), {
-      target: { value: "newuser" },
+      target: { value: 'newuser' },
     });
     fireEvent.change(screen.getByLabelText(/^mot de passe$/i), {
-      target: { value: "Password123!" },
+      target: { value: 'Password123!' },
     });
 
     mockFetch.mockResolvedValueOnce({
       ok: false,
-      json: async () => ({ message: "signup error" }),
+      json: async () => ({ message: 'signup error' }),
     });
 
     fireEvent.submit(
-      screen.getByRole("button", { name: /créer mon compte/i }).closest("form")!
+      screen
+        .getByRole('button', { name: /créer mon compte/i })
+        .closest('form')!,
     );
 
     await waitFor(() => {
       expect(
-        screen.getByText(/erreur lors de la création du compte/i)
+        screen.getByText(/erreur lors de la création du compte/i),
       ).toBeInTheDocument();
     });
   });
@@ -105,121 +112,116 @@ describe("AuthPage - tests front sans backend", () => {
   test("signup réussi -> repasse en mode login, préremplit l'email et affiche le message de succès", async () => {
     render(<AuthPage />);
 
-    fireEvent.click(screen.getByRole("button", { name: /créer un compte/i }));
+    fireEvent.click(screen.getByRole('button', { name: /créer un compte/i }));
 
     fireEvent.change(screen.getByLabelText(/^email$/i), {
-      target: { value: "cool@user.com" },
+      target: { value: 'cool@user.com' },
     });
     fireEvent.change(screen.getByLabelText(/pseudo/i), {
-      target: { value: "cooluser" },
+      target: { value: 'cooluser' },
     });
     fireEvent.change(screen.getByLabelText(/^mot de passe$/i), {
-      target: { value: "StrongPass123!" },
+      target: { value: 'StrongPass123!' },
     });
 
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      json: async () => ({ user: { id: "u1", username: "cooluser" } }),
+      json: async () => ({ user: { id: 'u1', username: 'cooluser' } }),
     });
 
     fireEvent.submit(
-      screen.getByRole("button", { name: /créer mon compte/i }).closest("form")!
+      screen
+        .getByRole('button', { name: /créer mon compte/i })
+        .closest('form')!,
     );
-
-
 
     await waitFor(() => {
       expect(screen.getByLabelText(/email ou pseudo/i)).toBeInTheDocument();
 
       expect(
-        screen.getByLabelText(/email ou pseudo/i) as HTMLInputElement
-      ).toHaveValue("cool@user.com");
+        screen.getByLabelText(/email ou pseudo/i) as HTMLInputElement,
+      ).toHaveValue('cool@user.com');
 
       expect(
-        screen.getByText(/compte créé\. vous pouvez vous connecter\./i)
+        screen.getByText(/compte créé\. vous pouvez vous connecter\./i),
       ).toBeInTheDocument();
     });
   });
 
-  test("login réussi -> on écrit bien dans le localStorage le token et le user", async () => {
+  test('login réussi -> on écrit bien dans le localStorage le token et le user', async () => {
     render(<AuthPage />);
 
     fireEvent.change(screen.getByLabelText(/email ou pseudo/i), {
-      target: { value: "user1@test.com" },
+      target: { value: 'user1@test.com' },
     });
     fireEvent.change(screen.getByLabelText(/mot de passe/i), {
-      target: { value: "Password123!" },
+      target: { value: 'Password123!' },
     });
 
     mockFetch.mockResolvedValueOnce({
       ok: true,
       json: async () => ({
-        token: "abc123",
-        user: { id: "u1", username: "user1" },
+        token: 'abc123',
+        user: { id: 'u1', username: 'user1' },
       }),
     });
 
     fireEvent.submit(
-      screen.getByRole("button", { name: /se connecter/i }).closest("form")!
+      screen.getByRole('button', { name: /se connecter/i }).closest('form')!,
     );
 
     await waitFor(() => {
       expect(localStorageSetItemSpy).toHaveBeenCalledWith(
-        "authToken",
-        "abc123"
+        'authToken',
+        'abc123',
       );
       expect(localStorageSetItemSpy).toHaveBeenCalledWith(
-        "currentUser",
-        JSON.stringify({ id: "u1", username: "user1" })
+        'currentUser',
+        JSON.stringify({ id: 'u1', username: 'user1' }),
       );
     });
 
-    expect(
-      screen.getByText(/connecté avec succès/i)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/connecté avec succès/i)).toBeInTheDocument();
   });
 
   test("le bouton se désactive pendant l'envoi (loading)", async () => {
-  render(<AuthPage />);
+    render(<AuthPage />);
 
-  fireEvent.change(screen.getByLabelText(/email ou pseudo/i), {
-    target: { value: "user1@test.com" },
+    fireEvent.change(screen.getByLabelText(/email ou pseudo/i), {
+      target: { value: 'user1@test.com' },
+    });
+    fireEvent.change(screen.getByLabelText(/mot de passe/i), {
+      target: { value: 'Password123!' },
+    });
+
+    let resolveRequest: () => void = () => {};
+    const controlledPromise = new Promise<void>((resolve) => {
+      resolveRequest = resolve;
+    });
+
+    mockFetch.mockReturnValueOnce(
+      controlledPromise.then(() => ({
+        ok: true,
+        json: async () => ({
+          token: 'zzz',
+          user: { id: 'uX', username: 'slowUser' },
+        }),
+      })),
+    );
+
+    fireEvent.submit(
+      screen.getByRole('button', { name: /se connecter/i }).closest('form')!,
+    );
+
+    const disabledBtn = screen.getByRole('button', {
+      name: /connexion\.\.\./i,
+    });
+    expect(disabledBtn).toBeDisabled();
+
+    resolveRequest();
+
+    await waitFor(() => {
+      expect(localStorageSetItemSpy).toHaveBeenCalled();
+    });
   });
-  fireEvent.change(screen.getByLabelText(/mot de passe/i), {
-    target: { value: "Password123!" },
-  });
-
-  let resolveRequest: () => void = () => {};
-  const controlledPromise = new Promise<void>((resolve) => {
-    resolveRequest = resolve;
-  });
-
-  mockFetch.mockReturnValueOnce(
-    controlledPromise.then(() => ({
-      ok: true,
-      json: async () => ({
-        token: "zzz",
-        user: { id: "uX", username: "slowUser" },
-      }),
-    }))
-  );
-
-  fireEvent.submit(
-    screen.getByRole("button", { name: /se connecter/i }).closest("form")!
-  );
-
-  const disabledBtn = screen.getByRole("button", {
-    name: /connexion\.\.\./i,
-  });
-  expect(disabledBtn).toBeDisabled();
-
-  resolveRequest();
-
-  await waitFor(() => {
-    expect(localStorageSetItemSpy).toHaveBeenCalled();
-  });
-});
-
-
-
 });

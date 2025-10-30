@@ -1,7 +1,7 @@
-import React, { useState, FormEvent, CSSProperties, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, FormEvent, CSSProperties, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-const API_URL = "http://localhost:3000"; // backend
+const API_URL = 'http://localhost:3000'; // backend
 
 // --- Types ---
 interface SignupData {
@@ -23,8 +23,8 @@ interface LoginResponse {
 // --- API helpers ---
 async function apiSignup(data: SignupData) {
   const res = await fetch(`${API_URL}/auth/signup`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       email: data.email,
       password: data.password,
@@ -37,8 +37,8 @@ async function apiSignup(data: SignupData) {
 
 async function apiLogin(data: LoginData) {
   const res = await fetch(`${API_URL}/auth/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       identity: data.identity,
       password: data.password,
@@ -60,42 +60,42 @@ async function safeJson(res: Response) {
   try {
     return await res.json();
   } catch {
-    return { message: res.statusText || "Erreur réseau" };
+    return { message: res.statusText || 'Erreur réseau' };
   }
 }
 
 // --- Component ---
 const AuthPage: React.FC = () => {
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"login" | "signup">("login");
+  const [mode, setMode] = useState<'login' | 'signup'>('login');
 
   // login state
-  const [identity, setIdentity] = useState("");
-  const [loginPassword, setLoginPassword] = useState("");
+  const [identity, setIdentity] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
 
   // signup state
-  const [signupEmail, setSignupEmail] = useState("");
-  const [signupUsername, setSignupUsername] = useState("");
-  const [signupPassword, setSignupPassword] = useState("");
+  const [signupEmail, setSignupEmail] = useState('');
+  const [signupUsername, setSignupUsername] = useState('');
+  const [signupPassword, setSignupPassword] = useState('');
 
   // ui state
   const [loading, setLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState("");
-  const [infoMsg, setInfoMsg] = useState("");
+  const [errorMsg, setErrorMsg] = useState('');
+  const [infoMsg, setInfoMsg] = useState('');
 
   // ✅ Si déjà connecté → on valide le token et on redirige vers /home
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem('token');
     if (!token) return;
 
     (async () => {
       try {
         await apiMe(token);
-        navigate("/home");
+        navigate('/home');
       } catch {
         // token invalide → on nettoie
-        localStorage.removeItem("token");
-        localStorage.removeItem("currentUser");
+        localStorage.removeItem('token');
+        localStorage.removeItem('currentUser');
       }
     })();
   }, [navigate]);
@@ -104,20 +104,20 @@ const AuthPage: React.FC = () => {
   const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setErrorMsg("");
-    setInfoMsg("");
+    setErrorMsg('');
+    setInfoMsg('');
 
     try {
       const data = await apiLogin({ identity, password: loginPassword });
 
       // ✅ stocker token pour Option A
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("currentUser", JSON.stringify(data.user));
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('currentUser', JSON.stringify(data.user));
 
-      setInfoMsg("Connecté avec succès !");
-      navigate("/home");
+      setInfoMsg('Connecté avec succès !');
+      navigate('/home');
     } catch (err: any) {
-      setErrorMsg(err?.message || "Email ou mot de passe invalide.");
+      setErrorMsg(err?.message || 'Email ou mot de passe invalide.');
     } finally {
       setLoading(false);
     }
@@ -126,8 +126,8 @@ const AuthPage: React.FC = () => {
   const handleSignup = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setErrorMsg("");
-    setInfoMsg("");
+    setErrorMsg('');
+    setInfoMsg('');
 
     try {
       await apiSignup({
@@ -137,12 +137,12 @@ const AuthPage: React.FC = () => {
       });
 
       // après création du compte → repasser en login prérempli
-      setMode("login");
+      setMode('login');
       setIdentity(signupEmail);
-      setLoginPassword("");
-      setInfoMsg("Compte créé. Vous pouvez vous connecter.");
+      setLoginPassword('');
+      setInfoMsg('Compte créé. Vous pouvez vous connecter.');
     } catch (err: any) {
-      setErrorMsg(err?.message || "Erreur lors de la création du compte.");
+      setErrorMsg(err?.message || 'Erreur lors de la création du compte.');
     } finally {
       setLoading(false);
     }
@@ -150,102 +150,102 @@ const AuthPage: React.FC = () => {
 
   // --- Styles ---
   const pageStyle: CSSProperties = {
-    minHeight: "100vh",
-    backgroundColor: "#fff",
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
-    fontFamily: "system-ui, sans-serif",
-    color: "#000",
-    gap: "1.5rem",
+    minHeight: '100vh',
+    backgroundColor: '#fff',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    fontFamily: 'system-ui, sans-serif',
+    color: '#000',
+    gap: '1.5rem',
   };
 
   const titleStyle: CSSProperties = {
-    fontSize: "2rem",
+    fontSize: '2rem',
     fontWeight: 700,
-    letterSpacing: "2px",
+    letterSpacing: '2px',
   };
 
   const cardStyle: CSSProperties = {
-    width: "100%",
-    maxWidth: "360px",
-    border: "1px solid #e5e7eb",
-    borderRadius: "12px",
-    padding: "20px",
-    boxShadow: "0 10px 25px rgba(0,0,0,0.08)",
-    backgroundColor: "#fff",
+    width: '100%',
+    maxWidth: '360px',
+    border: '1px solid #e5e7eb',
+    borderRadius: '12px',
+    padding: '20px',
+    boxShadow: '0 10px 25px rgba(0,0,0,0.08)',
+    backgroundColor: '#fff',
   };
 
   const toggleContainer: CSSProperties = {
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr",
-    gap: "6px",
-    marginBottom: "16px",
+    display: 'grid',
+    gridTemplateColumns: '1fr 1fr',
+    gap: '6px',
+    marginBottom: '16px',
   };
 
   const toggleBtn: CSSProperties = {
-    borderRadius: "6px",
-    border: "1px solid #000",
-    fontSize: ".85rem",
+    borderRadius: '6px',
+    border: '1px solid #000',
+    fontSize: '.85rem',
     fontWeight: 600,
-    padding: "8px",
-    cursor: "pointer",
-    transition: "0.2s",
+    padding: '8px',
+    cursor: 'pointer',
+    transition: '0.2s',
   };
 
   const activeBtn: CSSProperties = {
     ...toggleBtn,
-    backgroundColor: "#000",
-    color: "#fff",
+    backgroundColor: '#000',
+    color: '#fff',
   };
 
   const inactiveBtn: CSSProperties = {
     ...toggleBtn,
-    backgroundColor: "#fff",
-    color: "#000",
+    backgroundColor: '#fff',
+    color: '#000',
   };
 
   const labelStyle: CSSProperties = {
-    display: "block",
-    fontSize: ".75rem",
+    display: 'block',
+    fontSize: '.75rem',
     fontWeight: 500,
-    marginBottom: "4px",
+    marginBottom: '4px',
   };
 
   const inputStyle: CSSProperties = {
-    width: "100%",
-    borderRadius: "6px",
-    border: "1px solid #d1d5db",
-    fontSize: ".85rem",
-    padding: "8px 0px",
-    marginBottom: "10px",
-    paddingLeft: "8px",
+    width: '100%',
+    borderRadius: '6px',
+    border: '1px solid #d1d5db',
+    fontSize: '.85rem',
+    padding: '8px 0px',
+    marginBottom: '10px',
+    paddingLeft: '8px',
   };
 
   const buttonStyle: CSSProperties = {
-    width: "100%",
-    borderRadius: "6px",
-    backgroundColor: "#000",
-    color: "#fff",
+    width: '100%',
+    borderRadius: '6px',
+    backgroundColor: '#000',
+    color: '#fff',
     fontWeight: 600,
-    fontSize: ".85rem",
-    padding: "9px 10px",
-    border: "1px solid #000",
-    cursor: "pointer",
-    marginTop: "4px",
+    fontSize: '.85rem',
+    padding: '9px 10px',
+    border: '1px solid #000',
+    cursor: 'pointer',
+    marginTop: '4px',
   };
 
   const msgErrorStyle: CSSProperties = {
-    color: "red",
-    fontSize: ".8rem",
-    marginBottom: "8px",
+    color: 'red',
+    fontSize: '.8rem',
+    marginBottom: '8px',
   };
 
   const msgInfoStyle: CSSProperties = {
-    color: "green",
-    fontSize: ".8rem",
-    marginBottom: "8px",
+    color: 'green',
+    fontSize: '.8rem',
+    marginBottom: '8px',
   };
 
   // --- Render ---
@@ -257,23 +257,23 @@ const AuthPage: React.FC = () => {
         {/* Onglets Connexion / Inscription */}
         <div style={toggleContainer}>
           <button
-            style={mode === "login" ? activeBtn : inactiveBtn}
+            style={mode === 'login' ? activeBtn : inactiveBtn}
             disabled={loading}
             onClick={() => {
-              setMode("login");
-              setErrorMsg("");
-              setInfoMsg("");
+              setMode('login');
+              setErrorMsg('');
+              setInfoMsg('');
             }}
           >
             Connexion
           </button>
           <button
-            style={mode === "signup" ? activeBtn : inactiveBtn}
+            style={mode === 'signup' ? activeBtn : inactiveBtn}
             disabled={loading}
             onClick={() => {
-              setMode("signup");
-              setErrorMsg("");
-              setInfoMsg("");
+              setMode('signup');
+              setErrorMsg('');
+              setInfoMsg('');
             }}
           >
             Créer un compte
@@ -283,7 +283,7 @@ const AuthPage: React.FC = () => {
         {errorMsg && <div style={msgErrorStyle}>{errorMsg}</div>}
         {infoMsg && <div style={msgInfoStyle}>{infoMsg}</div>}
 
-        {mode === "login" ? (
+        {mode === 'login' ? (
           <form onSubmit={handleLogin}>
             <label htmlFor="identity" style={labelStyle}>
               Email ou pseudo
@@ -314,7 +314,7 @@ const AuthPage: React.FC = () => {
             />
 
             <button type="submit" style={buttonStyle} disabled={loading}>
-              {loading ? "Connexion..." : "Se connecter"}
+              {loading ? 'Connexion...' : 'Se connecter'}
             </button>
           </form>
         ) : (
@@ -362,7 +362,7 @@ const AuthPage: React.FC = () => {
             />
 
             <button type="submit" style={buttonStyle} disabled={loading}>
-              {loading ? "Création..." : "Créer mon compte"}
+              {loading ? 'Création...' : 'Créer mon compte'}
             </button>
           </form>
         )}
