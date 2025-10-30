@@ -1,6 +1,6 @@
 default:
   tags:
-    - self-hosted
+    - bardanmi
 
 stages:
   - lint
