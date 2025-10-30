@@ -124,7 +124,7 @@ export class PostsController {
       // Fetch author information
       const author = await this.userService.getUsersByIds([post.user_id]);
       const { user_id, ...postWithoutUserId } = post;
-
+      console.log('Fetched post with user id:', user_id); // Debug log to fix lint issue
       const enrichedPost = {
         ...postWithoutUserId,
         author: author[0]

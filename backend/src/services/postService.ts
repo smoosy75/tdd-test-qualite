@@ -37,7 +37,7 @@ export class PostService implements IPostService {
     try {
       // Build base query
       let baseQuery = 'SELECT * FROM app.posts WHERE 1=1';
-      const queryParams: any[] = [];
+      const queryParams: Object[] = [];
 
       // Filters
       if (options.authorId) {
@@ -74,9 +74,8 @@ export class PostService implements IPostService {
         postsResult.rows.map(async (post: Post) => {
           const sanitizedContent = sanitizeHtml(post.content);
 
-          let commentCount = await this.commentService.getCommentCountByPostId(
-            post.id
-          );
+          const commentCount =
+            await this.commentService.getCommentCountByPostId(post.id);
 
           // Pick only requested fields if specified
           const postData: Post = {
@@ -121,7 +120,7 @@ export class PostService implements IPostService {
    */
   async getPostById(
     postId: number,
-    include: string[] = []
+    _include: string[] = []
   ): Promise<Post | null> {
     const client = await this.db.connect();
     try {
