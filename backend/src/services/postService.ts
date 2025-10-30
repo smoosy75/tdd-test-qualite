@@ -37,7 +37,7 @@ export class PostService implements IPostService {
     try {
       // Build base query
       let baseQuery = 'SELECT * FROM app.posts WHERE 1=1';
-      const queryParams: Object[] = [];
+      const queryParams: any[] = [];
 
       // Filters
       if (options.authorId) {
@@ -118,10 +118,7 @@ export class PostService implements IPostService {
   /**
    * Fetch a single post by ID, optionally including comments
    */
-  async getPostById(
-    postId: number,
-    _include: string[] = []
-  ): Promise<Post | null> {
+  async getPostById(postId: number): Promise<Post | null> {
     const client = await this.db.connect();
     try {
       const postResult = await client.query(
@@ -134,7 +131,7 @@ export class PostService implements IPostService {
 
       const sanitizedContent = sanitizeHtml(post.content);
 
-      let commentCount = await this.commentService.getCommentCountByPostId(
+      const commentCount = await this.commentService.getCommentCountByPostId(
         post.id
       );
 
