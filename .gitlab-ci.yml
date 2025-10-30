@@ -88,7 +88,13 @@ lighthouse_ci:
     - 'grep -Eo "/assets/[^\" ]+\\.js" dist/index.html || { echo "ERROR: no /assets/*.js in dist/index.html"; exit 1; }'
   script:
     # Run LHCI against the static build; fail on recommended assertions (checkout lighthouserc.json)
-    - lhci autorun
+    #- lhci autorun
+    - lhci collect --verbose || true
+    - ls -l .lighthouseci
+    # show runtimeError and category scores for the *median* run file
+    - jq '.[0] | {requestedUrl, runtimeError, categories: {perf: .categories.performance.score, a11y: .categories.accessibility.score}}' .lighthouseci/*.lhr.json || true
+    - lhci assert
+    - lhci upload
   artifacts:
     when: always
     paths:
