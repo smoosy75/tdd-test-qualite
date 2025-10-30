@@ -86,7 +86,6 @@ lighthouse_ci:
     - test -f dist/index.html
     - '(! grep -q "/src/main.tsx" dist/index.html) || { echo "ERROR: dist/index.html still points to dev entry"; exit 1; }'
     - 'grep -Eo "/assets/[^\" ]+\\.js" dist/index.html || { echo "ERROR: no /assets/*.js in dist/index.html"; exit 1; }'
-
   script:
     # Run LHCI against the static build; fail on recommended assertions (checkout lighthouserc.json)
     - lhci autorun

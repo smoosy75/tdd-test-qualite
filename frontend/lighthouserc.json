@@ -6,7 +6,9 @@
       "settings": {
         "chromeFlags": "--headless=old --no-sandbox --disable-dev-shm-usage",
         "maxWaitForFcp": 60000,
-        "maxWaitForLoad": 90000
+        "maxWaitForLoad": 90000,
+        "throttlingMethod": "devtools",
+        "formFactor": "desktop"
       }
     },
     "assert": {
