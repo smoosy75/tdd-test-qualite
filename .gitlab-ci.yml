@@ -11,7 +11,7 @@ stages:
 variables:
   NODE_ENV: test
 
----------- LINT / FORMAT ----------
+# ---------- LINT / FORMAT ----------
 secrets_scan:
   stage: lint
   image: zricethezav/gitleaks:8
@@ -19,7 +19,6 @@ secrets_scan:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
-
 # backend_lint_format:
 #   stage: lint
 #   image: node:20-alpine
