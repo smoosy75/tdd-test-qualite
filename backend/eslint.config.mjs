@@ -20,6 +20,7 @@ export default tseslint.config(
     plugins: { prettier },
     rules: {
       'prettier/prettier': 'error',
+      '@typescript-eslint/no-explicit-any': 'off',
     },
     ignores: ['dist', 'coverage', 'node_modules'],
   }

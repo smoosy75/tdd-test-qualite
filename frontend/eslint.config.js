@@ -22,6 +22,7 @@ export default tseslint.config(
       ...reactHooks.configs.recommended.rules,
       'react-refresh/only-export-components': 'warn',
       'prettier/prettier': 'error',
+      '@typescript-eslint/no-explicit-any': 'off',
     },
     ignores: ['dist', 'coverage'],
   },
