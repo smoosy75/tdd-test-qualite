@@ -86,8 +86,8 @@ sonarqube_backend:
     sonar-scanner \
       -Dsonar.host.url="${SONAR_HOST_URL}" \
       -Dsonar.login="${SONAR_TOKEN}" \
-      -Dsonar.projectKey=bardanmi_tdd-and-quality-backend \
-      -Dsonar.projectName="tdd&quality_backend" \
+      -Dsonar.projectKey="${PROJECT_KEY_BACKEND}" \
+      -Dsonar.projectName="${PROJECT_NAME_BACKEND}" \
       -Dsonar.sources=backend/src \
       -Dsonar.tests=backend/src \
       -Dsonar.test.inclusions="**/*.test.*,**/*.spec.*" \
@@ -119,8 +119,8 @@ sonarqube_frontend:
     sonar-scanner \
       -Dsonar.host.url="${SONAR_HOST_URL}" \
       -Dsonar.login="${SONAR_TOKEN}" \
-      -Dsonar.projectKey=bardanmi_tdd-and-quality \
-      -Dsonar.projectName="tdd&quality" \
+      -Dsonar.projectKey="${PROJECT_KEY_FRONTEND}" \
+      -Dsonar.projectName="${PROJECT_NAME_FRONTEND}" \
       -Dsonar.sources=frontend/src \
       -Dsonar.tests=frontend/src \
       -Dsonar.test.inclusions="**/*.test.*,**/*.spec.*" \
