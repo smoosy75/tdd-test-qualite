@@ -92,7 +92,7 @@ class PocketbaseService {
       const data = await res.json();
       return data.record ?? null; // retourne l'utilisateur ou null
     } catch (err) {
-      return null;
+      return err;
     }
   }
 }

@@ -20,6 +20,6 @@
     "noImplicitAny": false,
     "typeRoots": ["./node_modules/@types", "./src/types"]
   },
-  "include": ["src/**/*.ts","src"],
+  "include": ["src/**/*.ts", "src"],
   "exclude": ["node_modules", "dist"]
 }
