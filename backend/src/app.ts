@@ -1,37 +1,42 @@
-import express, { Application, Request, Response } from 'express';
-import cors from 'cors';
-import authRoutes from './routes/auth.routes';
-import authGuard from './middleware/auth.middleware';
+import express, { Application } from "express";
+import authRoutes from "./routes/auth.routes";
+import cors from "cors";
+import authGuard from "./middleware/auth.middleware";
+
 
 const app: Application = express();
 
-app.use(
-  cors({
-    origin: 'http://localhost:5173',
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: false,
-  })
-);
 
-app.use(express.json());
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: false,
+  methods: ["GET","POST","PUT","PATCH","DELETE","OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"], // 👈
+}));
 
-app.get('/hello', (_req: Request, res: Response) => {
-  res.status(200).json({ status: 'ok' });
+app.use(express.json());                 // 👈 indispensable
+app.use(express.urlencoded({ extended: true })); // (optionnel)
+
+// route de test santé (optionnelle)
+app.get("/hello", (req, res) => {
+  res.status(200).json({ status: "ok" });
 });
 
-app.use('/auth', authRoutes);
+// ⬇️ ICI : on monte les routes d'auth
+app.use("/auth", authRoutes);
 
-app.get('/auth/debug-routes', (_req: Request, res: Response) => {
-  res.json({ alive: true, msg: 'auth routes zone reached' });
+app.get("/auth/debug-routes", (req, res) => {
+  res.json({ alive: true });
 });
 
-app.get('/me', authGuard, (req: Request, res: Response) => {
-  res.json({ user: req.user });
+app.get("/me", authGuard, (req, res) => {
+  res.json({ user: (req as any).user });
 });
 
-app.use((_req: Request, res: Response) => {
-  res.status(404).json({ message: 'Not found' });
+
+// 404 à la fin seulement
+app.use((req, res) => {
+  res.status(404).json({ message: "Not found" });
 });
 
 export default app;
