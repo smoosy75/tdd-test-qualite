@@ -4,6 +4,7 @@ import { Routes, Route } from "react-router-dom";
 import LoginPage from "@/pages/loginPage.tsx";
 import PostsList from "@/components/PostsList";
 import PostDetail from "@/components/PostDetail";
+import Navbar from "@/components/navbar";
 
 function App() {
   const [status, setStatus] = useState("checking...");
@@ -17,6 +18,8 @@ function App() {
 
   return (
     <div>
+      <Navbar />
+
       <header style={{
         textAlign: "center",
         padding: "20px",
