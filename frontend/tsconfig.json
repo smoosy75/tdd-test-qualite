@@ -2,6 +2,7 @@
   "compilerOptions": {
     "target": "ESNext",
     "module": "ESNext",
+    "types": ["vitest/globals", "@testing-library/jest-dom"],
     "moduleResolution": "Node",
     "strict": true,
     "jsx": "react-jsx",
