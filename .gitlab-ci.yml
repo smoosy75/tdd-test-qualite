@@ -166,7 +166,7 @@ k6_load:
   variables:
     API_BASE_URL: "http://localhost:3000"
   script:
-    - k6 run backend/perf/load.js
+    - run -e API_BASE_URL=$API_BASE_URL backend/perf/load_test.js
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
