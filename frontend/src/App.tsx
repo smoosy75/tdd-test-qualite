@@ -1,19 +1,9 @@
-import { useEffect, useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
 
-import LoginPage from '@/pages/loginPage';
-import ProfilePage from '@/pages/profilPage';
+import LoginPage from './pages/loginPage.tsx/LoginPage';
+import ProfilePage from './pages/profilPage.tsx/profilPage';
 
 function App() {
-  const [status, setStatus] = useState('checking...');
-
-  useEffect(() => {
-    fetch('http://localhost:3000/hello')
-      .then((res) => res.json())
-      .then((data) => setStatus(data.status))
-      .catch(() => setStatus('offline'));
-  }, []);
-
   return (
     <>
       <Routes>
