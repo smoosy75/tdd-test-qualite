@@ -2,7 +2,7 @@ import express, { Application } from 'express';
 import authRoutes from './routes/auth.routes';
 import cors from 'cors';
 import authGuard from './middleware/auth.middleware';
-
+import type { Request, Response, NextFunction } from 'express';
 const app: Application = express();
 
 app.use(
@@ -30,7 +30,7 @@ app.get('/auth/debug-routes', (req, res) => {
 });
 
 app.get('/me', authGuard, (req, res) => {
-  res.json({ user: (req as any).user });
+  res.json({ user: req.user });
 });
 
 // 404 à la fin seulement

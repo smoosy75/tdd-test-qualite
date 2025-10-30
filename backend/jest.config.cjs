@@ -1,3 +1,5 @@
+/* eslint-env node */
+/* global module */
 module.exports = {
   // On indique à Jest d'utiliser ts-jest pour transpiler TS/JS moderne
   transform: {
@@ -16,8 +18,7 @@ module.exports = {
 
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
 
-  // On ignore la transformation de node_modules sauf cas spécial => défaut standard
   transformIgnorePatterns: [
-    'node_modules/(?!.*)', // on peut laisser ça simple ici
+    'node_modules/(?!.*)'
   ],
 };
