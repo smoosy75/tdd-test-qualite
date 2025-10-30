@@ -1,4 +1,29 @@
-import { describe, it, expect } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router';
+import PostsList from '../components/PostsList';
+import { postsApi } from '../services/posts';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+// Mock the postsApi service
+vi.mock('../services/posts', () => ({
+  postsApi: {
+    getPosts: vi.fn(),
+  },
+}));
+
+describe('PostsList Component', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  const renderPostsList = () => {
+    return render(
+      <MemoryRouter>
+        <PostsList />
+      </MemoryRouter>
+    );
+  };
 
 describe('Loading State', () => {
   it('should display loading spinner while fetching posts', () => {
@@ -386,70 +411,71 @@ describe('Accessibility', () => {
   it('should have alt text for post images', async () => {
     // TODO: Implement test
     // Test that images have alt attribute with post title
-    expect(true).toBe(false);
+      expect(true).toBe(false);
+    });
+
+    it('should have alt text for avatar images', async () => {
+      // TODO: Implement test
+      // Test that avatars have alt attribute with author name
+      expect(true).toBe(false);
+    });
+
+    it('should have disabled state properly indicated on buttons', async () => {
+      // TODO: Implement test
+      // Test that disabled pagination buttons have proper attributes
+      expect(true).toBe(false);
+    });
+
+    it('should use h1 for page title', async () => {
+      // TODO: Implement test
+      // Test that "All Posts" uses proper heading hierarchy
+      expect(true).toBe(false);
+    });
+
+    it('should use h2 for post titles', async () => {
+      // TODO: Implement test
+      // Test that post titles use h2 tags
+      expect(true).toBe(false);
+    });
   });
 
-  it('should have alt text for avatar images', async () => {
-    // TODO: Implement test
-    // Test that avatars have alt attribute with author name
-    expect(true).toBe(false);
+  describe('Responsive Behavior', () => {
+    it('should apply responsive grid classes', async () => {
+      // TODO: Implement test
+      // Test that posts-grid has responsive CSS classes
+      expect(true).toBe(false);
+    });
+
+    it('should render properly with many posts', async () => {
+      // TODO: Implement test
+      // Test that component handles rendering 10+ posts efficiently
+      expect(true).toBe(false);
+    });
   });
 
-  it('should have disabled state properly indicated on buttons', async () => {
-    // TODO: Implement test
-    // Test that disabled pagination buttons have proper attributes
-    expect(true).toBe(false);
-  });
+  describe('Edge Cases', () => {
+    it('should handle posts with very long titles', async () => {
+      // TODO: Implement test
+      // Test that long titles don't break card layout
+      expect(true).toBe(false);
+    });
 
-  it('should use h1 for page title', async () => {
-    // TODO: Implement test
-    // Test that "All Posts" uses proper heading hierarchy
-    expect(true).toBe(false);
-  });
+    it('should handle posts with zero comments', async () => {
+      // TODO: Implement test
+      // Test that "0 comments" displays correctly
+      expect(true).toBe(false);
+    });
 
-  it('should use h2 for post titles', async () => {
-    // TODO: Implement test
-    // Test that post titles use h2 tags
-    expect(true).toBe(false);
-  });
-});
+    it('should handle missing author data gracefully', async () => {
+      // TODO: Implement test
+      // Test fallback behavior when author info is incomplete
+      expect(true).toBe(false);
+    });
 
-describe('Responsive Behavior', () => {
-  it('should apply responsive grid classes', async () => {
-    // TODO: Implement test
-    // Test that posts-grid has responsive CSS classes
-    expect(true).toBe(false);
-  });
-
-  it('should render properly with many posts', async () => {
-    // TODO: Implement test
-    // Test that component handles rendering 10+ posts efficiently
-    expect(true).toBe(false);
-  });
-});
-
-describe('Edge Cases', () => {
-  it('should handle posts with very long titles', async () => {
-    // TODO: Implement test
-    // Test that long titles don't break card layout
-    expect(true).toBe(false);
-  });
-
-  it('should handle posts with zero comments', async () => {
-    // TODO: Implement test
-    // Test that "0 comments" displays correctly
-    expect(true).toBe(false);
-  });
-
-  it('should handle missing author data gracefully', async () => {
-    // TODO: Implement test
-    // Test fallback behavior when author info is incomplete
-    expect(true).toBe(false);
-  });
-
-  it('should handle posts without images', async () => {
-    // TODO: Implement test
-    // Test that cards render properly when imageUrl is null
-    expect(true).toBe(false);
+    it('should handle posts without images', async () => {
+      // TODO: Implement test
+      // Test that cards render properly when imageUrl is null
+      expect(true).toBe(false);
+    });
   });
 });
