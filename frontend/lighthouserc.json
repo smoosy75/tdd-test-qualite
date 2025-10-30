@@ -20,6 +20,9 @@
         "render-blocking-resources": ["warn", { "maxLength": 1 }],
         "render-blocking-insight": ["warn", { "maxLength": 1 }]
       }
+    },
+    "upload": {
+      "target": "temporary-public-storage"
     }
   }
 }
