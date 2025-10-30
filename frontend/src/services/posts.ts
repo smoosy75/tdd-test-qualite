@@ -3,7 +3,10 @@ import type { Post, PostsResponse, CommentsResponse } from '../types';
 const API_BASE_URL = 'http://localhost:3000/api';
 
 export class PostsApiError extends Error {
-  constructor(public status: number, message: string) {
+  constructor(
+    public status: number,
+    message: string,
+  ) {
     super(message);
     this.name = 'PostsApiError';
   }
@@ -17,7 +20,7 @@ async function fetchApi<T>(endpoint: string): Promise<T> {
       const errorText = await response.text();
       throw new PostsApiError(
         response.status,
-        `API error: ${response.status} - ${errorText}`
+        `API error: ${response.status} - ${errorText}`,
       );
     }
 
@@ -26,7 +29,9 @@ async function fetchApi<T>(endpoint: string): Promise<T> {
     if (error instanceof PostsApiError) {
       throw error;
     }
-    throw new Error(`Network error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    throw new Error(
+      `Network error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+    );
   }
 }
 
@@ -57,8 +62,10 @@ export const postsApi = {
   async getCommentsByPostId(
     postId: number,
     page: number = 1,
-    size: number = 10
+    size: number = 10,
   ): Promise<CommentsResponse> {
-    return fetchApi<CommentsResponse>(`/comments/${postId}?page=${page}&size=${size}`);
+    return fetchApi<CommentsResponse>(
+      `/comments/${postId}?page=${page}&size=${size}`,
+    );
   },
 };

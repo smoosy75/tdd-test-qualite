@@ -11,26 +11,29 @@ vi.mock('../services/posts', () => ({
   },
 }));
 
-  describe('Comments Component', () => {
-    beforeEach(() => {
-      vi.clearAllMocks();
-    });
+describe('Comments Component', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
 
   describe('Loading State', () => {
     it('should display loading spinner while fetching comments', () => {
       vi.mocked(postsApi.getCommentsByPostId).mockImplementation(
-        () => new Promise(() => {}) // Never resolves to keep loading state
+        () => new Promise(() => {}), // Never resolves to keep loading state
       );
 
       render(<Comments postId={1} />);
 
-      expect(screen.getByRole('alert', { busy: true }) || screen.getByText('Loading comments...')).toBeInTheDocument();
+      expect(
+        screen.getByRole('alert', { busy: true }) ||
+          screen.getByText('Loading comments...'),
+      ).toBeInTheDocument();
       expect(document.querySelector('.spinner')).toBeInTheDocument();
     });
 
     it('should display "Loading comments..." text', () => {
       vi.mocked(postsApi.getCommentsByPostId).mockImplementation(
-        () => new Promise(() => {}) // Never resolves to keep loading state
+        () => new Promise(() => {}), // Never resolves to keep loading state
       );
 
       render(<Comments postId={1} />);
@@ -49,10 +52,15 @@ vi.mock('../services/posts', () => ({
             content: 'Test comment',
             created_at: '2025-01-15T15:30:00Z',
             updated_at: '2025-01-15T15:30:00Z',
-            author: { id: 'user1', name: 'John Doe', avatar: null }
-          }
+            author: { id: 'user1', name: 'John Doe', avatar: null },
+          },
         ],
-        metadata: { totalItems: 1, currentPage: 1, pageSize: 10, totalPages: 1 }
+        metadata: {
+          totalItems: 1,
+          currentPage: 1,
+          pageSize: 10,
+          totalPages: 1,
+        },
       };
 
       vi.mocked(postsApi.getCommentsByPostId).mockResolvedValue(mockComments);
@@ -73,10 +81,15 @@ vi.mock('../services/posts', () => ({
             content: 'Test comment',
             created_at: '2025-01-15T15:30:00Z',
             updated_at: '2025-01-15T15:30:00Z',
-            author: { id: 'user1', name: 'John Doe', avatar: null }
-          }
+            author: { id: 'user1', name: 'John Doe', avatar: null },
+          },
         ],
-        metadata: { totalItems: 1, currentPage: 1, pageSize: 10, totalPages: 1 }
+        metadata: {
+          totalItems: 1,
+          currentPage: 1,
+          pageSize: 10,
+          totalPages: 1,
+        },
       };
 
       vi.mocked(postsApi.getCommentsByPostId).mockResolvedValue(mockComments);
@@ -97,10 +110,15 @@ vi.mock('../services/posts', () => ({
             content: 'This is my test comment content',
             created_at: '2025-01-15T15:30:00Z',
             updated_at: '2025-01-15T15:30:00Z',
-            author: { id: 'user1', name: 'John Doe', avatar: null }
-          }
+            author: { id: 'user1', name: 'John Doe', avatar: null },
+          },
         ],
-        metadata: { totalItems: 1, currentPage: 1, pageSize: 10, totalPages: 1 }
+        metadata: {
+          totalItems: 1,
+          currentPage: 1,
+          pageSize: 10,
+          totalPages: 1,
+        },
       };
 
       vi.mocked(postsApi.getCommentsByPostId).mockResolvedValue(mockComments);
@@ -108,7 +126,9 @@ vi.mock('../services/posts', () => ({
       render(<Comments postId={1} />);
 
       await waitFor(() => {
-        expect(screen.getByText('This is my test comment content')).toBeInTheDocument();
+        expect(
+          screen.getByText('This is my test comment content'),
+        ).toBeInTheDocument();
       });
     });
 
@@ -121,10 +141,15 @@ vi.mock('../services/posts', () => ({
             content: 'Test comment',
             created_at: '2025-01-15T15:30:00Z',
             updated_at: '2025-01-15T15:30:00Z',
-            author: { id: 'user1', name: 'John Doe', avatar: null }
-          }
+            author: { id: 'user1', name: 'John Doe', avatar: null },
+          },
         ],
-        metadata: { totalItems: 1, currentPage: 1, pageSize: 10, totalPages: 1 }
+        metadata: {
+          totalItems: 1,
+          currentPage: 1,
+          pageSize: 10,
+          totalPages: 1,
+        },
       };
 
       vi.mocked(postsApi.getCommentsByPostId).mockResolvedValue(mockComments);
@@ -145,10 +170,19 @@ vi.mock('../services/posts', () => ({
             content: 'Test comment',
             created_at: '2025-01-15T15:30:00Z',
             updated_at: '2025-01-15T15:30:00Z',
-            author: { id: 'user1', name: 'John Doe', avatar: 'https://example.com/avatar.jpg' }
-          }
+            author: {
+              id: 'user1',
+              name: 'John Doe',
+              avatar: 'https://example.com/avatar.jpg',
+            },
+          },
         ],
-        metadata: { totalItems: 1, currentPage: 1, pageSize: 10, totalPages: 1 }
+        metadata: {
+          totalItems: 1,
+          currentPage: 1,
+          pageSize: 10,
+          totalPages: 1,
+        },
       };
 
       vi.mocked(postsApi.getCommentsByPostId).mockResolvedValue(mockComments);
@@ -171,10 +205,15 @@ vi.mock('../services/posts', () => ({
             content: 'Test comment',
             created_at: '2025-01-15T15:30:00Z',
             updated_at: '2025-01-15T15:30:00Z',
-            author: { id: 'user1', name: 'John Doe', avatar: null }
-          }
+            author: { id: 'user1', name: 'John Doe', avatar: null },
+          },
         ],
-        metadata: { totalItems: 1, currentPage: 1, pageSize: 10, totalPages: 1 }
+        metadata: {
+          totalItems: 1,
+          currentPage: 1,
+          pageSize: 10,
+          totalPages: 1,
+        },
       };
 
       vi.mocked(postsApi.getCommentsByPostId).mockResolvedValue(mockComments);
@@ -182,7 +221,9 @@ vi.mock('../services/posts', () => ({
       render(<Comments postId={1} />);
 
       await waitFor(() => {
-        const placeholder = document.querySelector('.comment-avatar-placeholder');
+        const placeholder = document.querySelector(
+          '.comment-avatar-placeholder',
+        );
         expect(placeholder).toBeInTheDocument();
         expect(placeholder).toHaveTextContent('J');
       });
@@ -197,10 +238,15 @@ vi.mock('../services/posts', () => ({
             content: 'Test comment',
             created_at: '2025-01-15T15:30:00Z',
             updated_at: '2025-01-15T16:30:00Z',
-            author: { id: 'user1', name: 'John Doe', avatar: null }
-          }
+            author: { id: 'user1', name: 'John Doe', avatar: null },
+          },
         ],
-        metadata: { totalItems: 1, currentPage: 1, pageSize: 10, totalPages: 1 }
+        metadata: {
+          totalItems: 1,
+          currentPage: 1,
+          pageSize: 10,
+          totalPages: 1,
+        },
       };
 
       vi.mocked(postsApi.getCommentsByPostId).mockResolvedValue(mockComments);
@@ -221,10 +267,15 @@ vi.mock('../services/posts', () => ({
             content: 'Test comment',
             created_at: '2025-01-15T15:30:00Z',
             updated_at: '2025-01-15T15:30:00Z',
-            author: { id: 'user1', name: 'John Doe', avatar: null }
-          }
+            author: { id: 'user1', name: 'John Doe', avatar: null },
+          },
         ],
-        metadata: { totalItems: 1, currentPage: 1, pageSize: 10, totalPages: 1 }
+        metadata: {
+          totalItems: 1,
+          currentPage: 1,
+          pageSize: 10,
+          totalPages: 1,
+        },
       };
 
       vi.mocked(postsApi.getCommentsByPostId).mockResolvedValue(mockComments);
@@ -245,7 +296,7 @@ vi.mock('../services/posts', () => ({
             content: 'Test comment 1',
             created_at: '2025-01-15T15:30:00Z',
             updated_at: '2025-01-15T15:30:00Z',
-            author: { id: 'user1', name: 'John Doe', avatar: null }
+            author: { id: 'user1', name: 'John Doe', avatar: null },
           },
           {
             id: 2,
@@ -253,10 +304,15 @@ vi.mock('../services/posts', () => ({
             content: 'Test comment 2',
             created_at: '2025-01-15T15:30:00Z',
             updated_at: '2025-01-15T15:30:00Z',
-            author: { id: 'user2', name: 'Jane Smith', avatar: null }
-          }
+            author: { id: 'user2', name: 'Jane Smith', avatar: null },
+          },
         ],
-        metadata: { totalItems: 2, currentPage: 1, pageSize: 10, totalPages: 1 }
+        metadata: {
+          totalItems: 2,
+          currentPage: 1,
+          pageSize: 10,
+          totalPages: 1,
+        },
       };
 
       vi.mocked(postsApi.getCommentsByPostId).mockResolvedValue(mockComments);
@@ -277,7 +333,7 @@ vi.mock('../services/posts', () => ({
             content: 'First comment',
             created_at: '2025-01-15T15:30:00Z',
             updated_at: '2025-01-15T15:30:00Z',
-            author: { id: 'user1', name: 'John Doe', avatar: null }
+            author: { id: 'user1', name: 'John Doe', avatar: null },
           },
           {
             id: 2,
@@ -285,7 +341,7 @@ vi.mock('../services/posts', () => ({
             content: 'Second comment',
             created_at: '2025-01-15T16:30:00Z',
             updated_at: '2025-01-15T16:30:00Z',
-            author: { id: 'user2', name: 'Jane Smith', avatar: null }
+            author: { id: 'user2', name: 'Jane Smith', avatar: null },
           },
           {
             id: 3,
@@ -293,10 +349,15 @@ vi.mock('../services/posts', () => ({
             content: 'Third comment',
             created_at: '2025-01-15T17:30:00Z',
             updated_at: '2025-01-15T17:30:00Z',
-            author: { id: 'user3', name: 'Bob Johnson', avatar: null }
-          }
+            author: { id: 'user3', name: 'Bob Johnson', avatar: null },
+          },
         ],
-        metadata: { totalItems: 3, currentPage: 1, pageSize: 10, totalPages: 1 }
+        metadata: {
+          totalItems: 3,
+          currentPage: 1,
+          pageSize: 10,
+          totalPages: 1,
+        },
       };
 
       vi.mocked(postsApi.getCommentsByPostId).mockResolvedValue(mockComments);
@@ -315,7 +376,12 @@ vi.mock('../services/posts', () => ({
     it('should display empty message when no comments exist', async () => {
       const mockComments = {
         items: [],
-        metadata: { totalItems: 0, currentPage: 1, pageSize: 10, totalPages: 0 }
+        metadata: {
+          totalItems: 0,
+          currentPage: 1,
+          pageSize: 10,
+          totalPages: 0,
+        },
       };
 
       vi.mocked(postsApi.getCommentsByPostId).mockResolvedValue(mockComments);
@@ -330,7 +396,12 @@ vi.mock('../services/posts', () => ({
     it('should display "Be the first to comment!" message', async () => {
       const mockComments = {
         items: [],
-        metadata: { totalItems: 0, currentPage: 1, pageSize: 10, totalPages: 0 }
+        metadata: {
+          totalItems: 0,
+          currentPage: 1,
+          pageSize: 10,
+          totalPages: 0,
+        },
       };
 
       vi.mocked(postsApi.getCommentsByPostId).mockResolvedValue(mockComments);
@@ -338,7 +409,9 @@ vi.mock('../services/posts', () => ({
       render(<Comments postId={1} />);
 
       await waitFor(() => {
-        expect(screen.getByText(/Be the first to comment!/)).toBeInTheDocument();
+        expect(
+          screen.getByText(/Be the first to comment!/),
+        ).toBeInTheDocument();
       });
     });
   });
@@ -346,25 +419,29 @@ vi.mock('../services/posts', () => ({
   describe('Error State', () => {
     it('should display error message when API call fails', async () => {
       vi.mocked(postsApi.getCommentsByPostId).mockRejectedValue(
-        new Error('Failed to fetch comments')
+        new Error('Failed to fetch comments'),
       );
 
       render(<Comments postId={1} />);
 
       await waitFor(() => {
-        expect(screen.getByText(/Error: Failed to fetch comments/)).toBeInTheDocument();
+        expect(
+          screen.getByText(/Error: Failed to fetch comments/),
+        ).toBeInTheDocument();
       });
     });
 
     it('should display "Try Again" button on error', async () => {
       vi.mocked(postsApi.getCommentsByPostId).mockRejectedValue(
-        new Error('Failed to fetch comments')
+        new Error('Failed to fetch comments'),
       );
 
       render(<Comments postId={1} />);
 
       await waitFor(() => {
-        expect(screen.getByRole('button', { name: /try again/i })).toBeInTheDocument();
+        expect(
+          screen.getByRole('button', { name: /try again/i }),
+        ).toBeInTheDocument();
       });
     });
 
@@ -372,21 +449,30 @@ vi.mock('../services/posts', () => ({
       vi.mocked(postsApi.getCommentsByPostId)
         .mockRejectedValueOnce(new Error('Failed to fetch comments'))
         .mockResolvedValueOnce({
-          items: [{
-            id: 1,
-            user_id: 'user1',
-            content: 'Test comment',
-            created_at: '2025-01-15T15:30:00Z',
-            updated_at: '2025-01-15T15:30:00Z',
-            author: { id: 'user1', name: 'John Doe', avatar: null }
-          }],
-          metadata: { totalItems: 1, currentPage: 1, pageSize: 10, totalPages: 1 }
+          items: [
+            {
+              id: 1,
+              user_id: 'user1',
+              content: 'Test comment',
+              created_at: '2025-01-15T15:30:00Z',
+              updated_at: '2025-01-15T15:30:00Z',
+              author: { id: 'user1', name: 'John Doe', avatar: null },
+            },
+          ],
+          metadata: {
+            totalItems: 1,
+            currentPage: 1,
+            pageSize: 10,
+            totalPages: 1,
+          },
         });
 
       render(<Comments postId={1} />);
 
       await waitFor(() => {
-        expect(screen.getByRole('button', { name: /try again/i })).toBeInTheDocument();
+        expect(
+          screen.getByRole('button', { name: /try again/i }),
+        ).toBeInTheDocument();
       });
 
       const retryButton = screen.getByRole('button', { name: /try again/i });
@@ -399,15 +485,22 @@ vi.mock('../services/posts', () => ({
 
     it('should reset to page 1 when retry button is clicked', async () => {
       const mockSuccess = {
-        items: [{
-          id: 1,
-          user_id: 'user1',
-          content: 'Test comment',
-          created_at: '2025-01-15T15:30:00Z',
-          updated_at: '2025-01-15T15:30:00Z',
-          author: { id: 'user1', name: 'John Doe', avatar: null }
-        }],
-        metadata: { totalItems: 1, currentPage: 1, pageSize: 10, totalPages: 2 }
+        items: [
+          {
+            id: 1,
+            user_id: 'user1',
+            content: 'Test comment',
+            created_at: '2025-01-15T15:30:00Z',
+            updated_at: '2025-01-15T15:30:00Z',
+            author: { id: 'user1', name: 'John Doe', avatar: null },
+          },
+        ],
+        metadata: {
+          totalItems: 1,
+          currentPage: 1,
+          pageSize: 10,
+          totalPages: 2,
+        },
       };
 
       vi.mocked(postsApi.getCommentsByPostId)
@@ -442,15 +535,22 @@ vi.mock('../services/posts', () => ({
   describe('Pagination', () => {
     it('should display pagination controls when there are multiple pages', async () => {
       const mockComments = {
-        items: [{
-          id: 1,
-          user_id: 'user1',
-          content: 'Test comment',
-          created_at: '2025-01-15T15:30:00Z',
-          updated_at: '2025-01-15T15:30:00Z',
-          author: { id: 'user1', name: 'John Doe', avatar: null }
-        }],
-        metadata: { totalItems: 20, currentPage: 1, pageSize: 10, totalPages: 2 }
+        items: [
+          {
+            id: 1,
+            user_id: 'user1',
+            content: 'Test comment',
+            created_at: '2025-01-15T15:30:00Z',
+            updated_at: '2025-01-15T15:30:00Z',
+            author: { id: 'user1', name: 'John Doe', avatar: null },
+          },
+        ],
+        metadata: {
+          totalItems: 20,
+          currentPage: 1,
+          pageSize: 10,
+          totalPages: 2,
+        },
       };
 
       vi.mocked(postsApi.getCommentsByPostId).mockResolvedValue(mockComments);
@@ -458,23 +558,34 @@ vi.mock('../services/posts', () => ({
       render(<Comments postId={1} />);
 
       await waitFor(() => {
-        expect(screen.getByRole('button', { name: /previous/i })).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: /next/i })).toBeInTheDocument();
+        expect(
+          screen.getByRole('button', { name: /previous/i }),
+        ).toBeInTheDocument();
+        expect(
+          screen.getByRole('button', { name: /next/i }),
+        ).toBeInTheDocument();
         expect(screen.getByText(/Page 1 of 2/)).toBeInTheDocument();
       });
     });
 
     it('should not display pagination when there is only one page', async () => {
       const mockComments = {
-        items: [{
-          id: 1,
-          user_id: 'user1',
-          content: 'Test comment',
-          created_at: '2025-01-15T15:30:00Z',
-          updated_at: '2025-01-15T15:30:00Z',
-          author: { id: 'user1', name: 'John Doe', avatar: null }
-        }],
-        metadata: { totalItems: 1, currentPage: 1, pageSize: 10, totalPages: 1 }
+        items: [
+          {
+            id: 1,
+            user_id: 'user1',
+            content: 'Test comment',
+            created_at: '2025-01-15T15:30:00Z',
+            updated_at: '2025-01-15T15:30:00Z',
+            author: { id: 'user1', name: 'John Doe', avatar: null },
+          },
+        ],
+        metadata: {
+          totalItems: 1,
+          currentPage: 1,
+          pageSize: 10,
+          totalPages: 1,
+        },
       };
 
       vi.mocked(postsApi.getCommentsByPostId).mockResolvedValue(mockComments);
@@ -485,21 +596,32 @@ vi.mock('../services/posts', () => ({
         expect(screen.getByText('Test comment')).toBeInTheDocument();
       });
 
-      expect(screen.queryByRole('button', { name: /previous/i })).not.toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: /next/i })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: /previous/i }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: /next/i }),
+      ).not.toBeInTheDocument();
     });
 
     it('should disable "Previous" button on first page', async () => {
       const mockComments = {
-        items: [{
-          id: 1,
-          user_id: 'user1',
-          content: 'Test comment',
-          created_at: '2025-01-15T15:30:00Z',
-          updated_at: '2025-01-15T15:30:00Z',
-          author: { id: 'user1', name: 'John Doe', avatar: null }
-        }],
-        metadata: { totalItems: 20, currentPage: 1, pageSize: 10, totalPages: 2 }
+        items: [
+          {
+            id: 1,
+            user_id: 'user1',
+            content: 'Test comment',
+            created_at: '2025-01-15T15:30:00Z',
+            updated_at: '2025-01-15T15:30:00Z',
+            author: { id: 'user1', name: 'John Doe', avatar: null },
+          },
+        ],
+        metadata: {
+          totalItems: 20,
+          currentPage: 1,
+          pageSize: 10,
+          totalPages: 2,
+        },
       };
 
       vi.mocked(postsApi.getCommentsByPostId).mockResolvedValue(mockComments);
@@ -514,27 +636,41 @@ vi.mock('../services/posts', () => ({
 
     it('should disable "Next" button on last page', async () => {
       const mockPage1 = {
-        items: [{
-          id: 1,
-          user_id: 'user1',
-          content: 'Test comment',
-          created_at: '2025-01-15T15:30:00Z',
-          updated_at: '2025-01-15T15:30:00Z',
-          author: { id: 'user1', name: 'John Doe', avatar: null }
-        }],
-        metadata: { totalItems: 20, currentPage: 1, pageSize: 10, totalPages: 2 }
+        items: [
+          {
+            id: 1,
+            user_id: 'user1',
+            content: 'Test comment',
+            created_at: '2025-01-15T15:30:00Z',
+            updated_at: '2025-01-15T15:30:00Z',
+            author: { id: 'user1', name: 'John Doe', avatar: null },
+          },
+        ],
+        metadata: {
+          totalItems: 20,
+          currentPage: 1,
+          pageSize: 10,
+          totalPages: 2,
+        },
       };
 
       const mockPage2 = {
-        items: [{
-          id: 2,
-          user_id: 'user2',
-          content: 'Test comment 2',
-          created_at: '2025-01-15T15:30:00Z',
-          updated_at: '2025-01-15T15:30:00Z',
-          author: { id: 'user2', name: 'Jane Doe', avatar: null }
-        }],
-        metadata: { totalItems: 20, currentPage: 2, pageSize: 10, totalPages: 2 }
+        items: [
+          {
+            id: 2,
+            user_id: 'user2',
+            content: 'Test comment 2',
+            created_at: '2025-01-15T15:30:00Z',
+            updated_at: '2025-01-15T15:30:00Z',
+            author: { id: 'user2', name: 'Jane Doe', avatar: null },
+          },
+        ],
+        metadata: {
+          totalItems: 20,
+          currentPage: 2,
+          pageSize: 10,
+          totalPages: 2,
+        },
       };
 
       vi.mocked(postsApi.getCommentsByPostId)
@@ -557,15 +693,22 @@ vi.mock('../services/posts', () => ({
 
     it('should display current page and total pages', async () => {
       const mockComments = {
-        items: [{
-          id: 1,
-          user_id: 'user1',
-          content: 'Test comment',
-          created_at: '2025-01-15T15:30:00Z',
-          updated_at: '2025-01-15T15:30:00Z',
-          author: { id: 'user1', name: 'John Doe', avatar: null }
-        }],
-        metadata: { totalItems: 50, currentPage: 1, pageSize: 10, totalPages: 5 }
+        items: [
+          {
+            id: 1,
+            user_id: 'user1',
+            content: 'Test comment',
+            created_at: '2025-01-15T15:30:00Z',
+            updated_at: '2025-01-15T15:30:00Z',
+            author: { id: 'user1', name: 'John Doe', avatar: null },
+          },
+        ],
+        metadata: {
+          totalItems: 50,
+          currentPage: 1,
+          pageSize: 10,
+          totalPages: 5,
+        },
       };
 
       vi.mocked(postsApi.getCommentsByPostId).mockResolvedValue(mockComments);
@@ -579,27 +722,41 @@ vi.mock('../services/posts', () => ({
 
     it('should fetch next page when "Next" button is clicked', async () => {
       const mockPage1 = {
-        items: [{
-          id: 1,
-          user_id: 'user1',
-          content: 'Page 1 comment',
-          created_at: '2025-01-15T15:30:00Z',
-          updated_at: '2025-01-15T15:30:00Z',
-          author: { id: 'user1', name: 'John Doe', avatar: null }
-        }],
-        metadata: { totalItems: 20, currentPage: 1, pageSize: 10, totalPages: 2 }
+        items: [
+          {
+            id: 1,
+            user_id: 'user1',
+            content: 'Page 1 comment',
+            created_at: '2025-01-15T15:30:00Z',
+            updated_at: '2025-01-15T15:30:00Z',
+            author: { id: 'user1', name: 'John Doe', avatar: null },
+          },
+        ],
+        metadata: {
+          totalItems: 20,
+          currentPage: 1,
+          pageSize: 10,
+          totalPages: 2,
+        },
       };
 
       const mockPage2 = {
-        items: [{
-          id: 2,
-          user_id: 'user2',
-          content: 'Page 2 comment',
-          created_at: '2025-01-15T15:30:00Z',
-          updated_at: '2025-01-15T15:30:00Z',
-          author: { id: 'user2', name: 'Jane Doe', avatar: null }
-        }],
-        metadata: { totalItems: 20, currentPage: 2, pageSize: 10, totalPages: 2 }
+        items: [
+          {
+            id: 2,
+            user_id: 'user2',
+            content: 'Page 2 comment',
+            created_at: '2025-01-15T15:30:00Z',
+            updated_at: '2025-01-15T15:30:00Z',
+            author: { id: 'user2', name: 'Jane Doe', avatar: null },
+          },
+        ],
+        metadata: {
+          totalItems: 20,
+          currentPage: 2,
+          pageSize: 10,
+          totalPages: 2,
+        },
       };
 
       vi.mocked(postsApi.getCommentsByPostId)
@@ -623,27 +780,41 @@ vi.mock('../services/posts', () => ({
 
     it('should fetch previous page when "Previous" button is clicked', async () => {
       const mockPage1 = {
-        items: [{
-          id: 1,
-          user_id: 'user1',
-          content: 'Page 1 comment',
-          created_at: '2025-01-15T15:30:00Z',
-          updated_at: '2025-01-15T15:30:00Z',
-          author: { id: 'user1', name: 'John Doe', avatar: null }
-        }],
-        metadata: { totalItems: 20, currentPage: 1, pageSize: 10, totalPages: 2 }
+        items: [
+          {
+            id: 1,
+            user_id: 'user1',
+            content: 'Page 1 comment',
+            created_at: '2025-01-15T15:30:00Z',
+            updated_at: '2025-01-15T15:30:00Z',
+            author: { id: 'user1', name: 'John Doe', avatar: null },
+          },
+        ],
+        metadata: {
+          totalItems: 20,
+          currentPage: 1,
+          pageSize: 10,
+          totalPages: 2,
+        },
       };
 
       const mockPage2 = {
-        items: [{
-          id: 2,
-          user_id: 'user2',
-          content: 'Page 2 comment',
-          created_at: '2025-01-15T15:30:00Z',
-          updated_at: '2025-01-15T15:30:00Z',
-          author: { id: 'user2', name: 'Jane Doe', avatar: null }
-        }],
-        metadata: { totalItems: 20, currentPage: 2, pageSize: 10, totalPages: 2 }
+        items: [
+          {
+            id: 2,
+            user_id: 'user2',
+            content: 'Page 2 comment',
+            created_at: '2025-01-15T15:30:00Z',
+            updated_at: '2025-01-15T15:30:00Z',
+            author: { id: 'user2', name: 'Jane Doe', avatar: null },
+          },
+        ],
+        metadata: {
+          totalItems: 20,
+          currentPage: 2,
+          pageSize: 10,
+          totalPages: 2,
+        },
       };
 
       vi.mocked(postsApi.getCommentsByPostId)
@@ -675,15 +846,22 @@ vi.mock('../services/posts', () => ({
 
     it('should not go below page 1 when clicking Previous', async () => {
       const mockComments = {
-        items: [{
-          id: 1,
-          user_id: 'user1',
-          content: 'Test comment',
-          created_at: '2025-01-15T15:30:00Z',
-          updated_at: '2025-01-15T15:30:00Z',
-          author: { id: 'user1', name: 'John Doe', avatar: null }
-        }],
-        metadata: { totalItems: 20, currentPage: 1, pageSize: 10, totalPages: 2 }
+        items: [
+          {
+            id: 1,
+            user_id: 'user1',
+            content: 'Test comment',
+            created_at: '2025-01-15T15:30:00Z',
+            updated_at: '2025-01-15T15:30:00Z',
+            author: { id: 'user1', name: 'John Doe', avatar: null },
+          },
+        ],
+        metadata: {
+          totalItems: 20,
+          currentPage: 1,
+          pageSize: 10,
+          totalPages: 2,
+        },
       };
 
       vi.mocked(postsApi.getCommentsByPostId).mockResolvedValue(mockComments);
@@ -700,27 +878,41 @@ vi.mock('../services/posts', () => ({
 
     it('should not exceed total pages when clicking Next', async () => {
       const mockPage1 = {
-        items: [{
-          id: 1,
-          user_id: 'user1',
-          content: 'Test comment',
-          created_at: '2025-01-15T15:30:00Z',
-          updated_at: '2025-01-15T15:30:00Z',
-          author: { id: 'user1', name: 'John Doe', avatar: null }
-        }],
-        metadata: { totalItems: 20, currentPage: 1, pageSize: 10, totalPages: 2 }
+        items: [
+          {
+            id: 1,
+            user_id: 'user1',
+            content: 'Test comment',
+            created_at: '2025-01-15T15:30:00Z',
+            updated_at: '2025-01-15T15:30:00Z',
+            author: { id: 'user1', name: 'John Doe', avatar: null },
+          },
+        ],
+        metadata: {
+          totalItems: 20,
+          currentPage: 1,
+          pageSize: 10,
+          totalPages: 2,
+        },
       };
 
       const mockPage2 = {
-        items: [{
-          id: 2,
-          user_id: 'user2',
-          content: 'Test comment 2',
-          created_at: '2025-01-15T15:30:00Z',
-          updated_at: '2025-01-15T15:30:00Z',
-          author: { id: 'user2', name: 'Jane Doe', avatar: null }
-        }],
-        metadata: { totalItems: 20, currentPage: 2, pageSize: 10, totalPages: 2 }
+        items: [
+          {
+            id: 2,
+            user_id: 'user2',
+            content: 'Test comment 2',
+            created_at: '2025-01-15T15:30:00Z',
+            updated_at: '2025-01-15T15:30:00Z',
+            author: { id: 'user2', name: 'Jane Doe', avatar: null },
+          },
+        ],
+        metadata: {
+          totalItems: 20,
+          currentPage: 2,
+          pageSize: 10,
+          totalPages: 2,
+        },
       };
 
       vi.mocked(postsApi.getCommentsByPostId)
@@ -746,15 +938,22 @@ vi.mock('../services/posts', () => ({
   describe('API Integration', () => {
     it('should call postsApi.getCommentsByPostId with correct postId', async () => {
       const mockComments = {
-        items: [{
-          id: 1,
-          user_id: 'user1',
-          content: 'Test comment',
-          created_at: '2025-01-15T15:30:00Z',
-          updated_at: '2025-01-15T15:30:00Z',
-          author: { id: 'user1', name: 'John Doe', avatar: null }
-        }],
-        metadata: { totalItems: 1, currentPage: 1, pageSize: 10, totalPages: 1 }
+        items: [
+          {
+            id: 1,
+            user_id: 'user1',
+            content: 'Test comment',
+            created_at: '2025-01-15T15:30:00Z',
+            updated_at: '2025-01-15T15:30:00Z',
+            author: { id: 'user1', name: 'John Doe', avatar: null },
+          },
+        ],
+        metadata: {
+          totalItems: 1,
+          currentPage: 1,
+          pageSize: 10,
+          totalPages: 1,
+        },
       };
 
       vi.mocked(postsApi.getCommentsByPostId).mockResolvedValue(mockComments);
@@ -769,7 +968,12 @@ vi.mock('../services/posts', () => ({
     it('should call API with default pagination (page=1, size=10)', async () => {
       const mockComments = {
         items: [],
-        metadata: { totalItems: 0, currentPage: 1, pageSize: 10, totalPages: 0 }
+        metadata: {
+          totalItems: 0,
+          currentPage: 1,
+          pageSize: 10,
+          totalPages: 0,
+        },
       };
 
       vi.mocked(postsApi.getCommentsByPostId).mockResolvedValue(mockComments);
@@ -783,27 +987,41 @@ vi.mock('../services/posts', () => ({
 
     it('should refetch comments when postId prop changes', async () => {
       const mockComments1 = {
-        items: [{
-          id: 1,
-          user_id: 'user1',
-          content: 'Comment for post 1',
-          created_at: '2025-01-15T15:30:00Z',
-          updated_at: '2025-01-15T15:30:00Z',
-          author: { id: 'user1', name: 'John Doe', avatar: null }
-        }],
-        metadata: { totalItems: 1, currentPage: 1, pageSize: 10, totalPages: 1 }
+        items: [
+          {
+            id: 1,
+            user_id: 'user1',
+            content: 'Comment for post 1',
+            created_at: '2025-01-15T15:30:00Z',
+            updated_at: '2025-01-15T15:30:00Z',
+            author: { id: 'user1', name: 'John Doe', avatar: null },
+          },
+        ],
+        metadata: {
+          totalItems: 1,
+          currentPage: 1,
+          pageSize: 10,
+          totalPages: 1,
+        },
       };
 
       const mockComments2 = {
-        items: [{
-          id: 2,
-          user_id: 'user2',
-          content: 'Comment for post 2',
-          created_at: '2025-01-15T15:30:00Z',
-          updated_at: '2025-01-15T15:30:00Z',
-          author: { id: 'user2', name: 'Jane Doe', avatar: null }
-        }],
-        metadata: { totalItems: 1, currentPage: 1, pageSize: 10, totalPages: 1 }
+        items: [
+          {
+            id: 2,
+            user_id: 'user2',
+            content: 'Comment for post 2',
+            created_at: '2025-01-15T15:30:00Z',
+            updated_at: '2025-01-15T15:30:00Z',
+            author: { id: 'user2', name: 'Jane Doe', avatar: null },
+          },
+        ],
+        metadata: {
+          totalItems: 1,
+          currentPage: 1,
+          pageSize: 10,
+          totalPages: 1,
+        },
       };
 
       vi.mocked(postsApi.getCommentsByPostId)
@@ -826,27 +1044,41 @@ vi.mock('../services/posts', () => ({
 
     it('should refetch comments when page changes', async () => {
       const mockPage1 = {
-        items: [{
-          id: 1,
-          user_id: 'user1',
-          content: 'Page 1 comment',
-          created_at: '2025-01-15T15:30:00Z',
-          updated_at: '2025-01-15T15:30:00Z',
-          author: { id: 'user1', name: 'John Doe', avatar: null }
-        }],
-        metadata: { totalItems: 20, currentPage: 1, pageSize: 10, totalPages: 2 }
+        items: [
+          {
+            id: 1,
+            user_id: 'user1',
+            content: 'Page 1 comment',
+            created_at: '2025-01-15T15:30:00Z',
+            updated_at: '2025-01-15T15:30:00Z',
+            author: { id: 'user1', name: 'John Doe', avatar: null },
+          },
+        ],
+        metadata: {
+          totalItems: 20,
+          currentPage: 1,
+          pageSize: 10,
+          totalPages: 2,
+        },
       };
 
       const mockPage2 = {
-        items: [{
-          id: 2,
-          user_id: 'user2',
-          content: 'Page 2 comment',
-          created_at: '2025-01-15T15:30:00Z',
-          updated_at: '2025-01-15T15:30:00Z',
-          author: { id: 'user2', name: 'Jane Doe', avatar: null }
-        }],
-        metadata: { totalItems: 20, currentPage: 2, pageSize: 10, totalPages: 2 }
+        items: [
+          {
+            id: 2,
+            user_id: 'user2',
+            content: 'Page 2 comment',
+            created_at: '2025-01-15T15:30:00Z',
+            updated_at: '2025-01-15T15:30:00Z',
+            author: { id: 'user2', name: 'Jane Doe', avatar: null },
+          },
+        ],
+        metadata: {
+          totalItems: 20,
+          currentPage: 2,
+          pageSize: 10,
+          totalPages: 2,
+        },
       };
 
       vi.mocked(postsApi.getCommentsByPostId)
@@ -871,15 +1103,22 @@ vi.mock('../services/posts', () => ({
   describe('Date Formatting', () => {
     it('should format dates in US locale with month, day, year, and time', async () => {
       const mockComments = {
-        items: [{
-          id: 1,
-          user_id: 'user1',
-          content: 'Test comment',
-          created_at: '2025-01-15T15:30:00Z',
-          updated_at: '2025-01-15T15:30:00Z',
-          author: { id: 'user1', name: 'John Doe', avatar: null }
-        }],
-        metadata: { totalItems: 1, currentPage: 1, pageSize: 10, totalPages: 1 }
+        items: [
+          {
+            id: 1,
+            user_id: 'user1',
+            content: 'Test comment',
+            created_at: '2025-01-15T15:30:00Z',
+            updated_at: '2025-01-15T15:30:00Z',
+            author: { id: 'user1', name: 'John Doe', avatar: null },
+          },
+        ],
+        metadata: {
+          totalItems: 1,
+          currentPage: 1,
+          pageSize: 10,
+          totalPages: 1,
+        },
       };
 
       vi.mocked(postsApi.getCommentsByPostId).mockResolvedValue(mockComments);
@@ -895,15 +1134,22 @@ vi.mock('../services/posts', () => ({
 
     it('should handle ISO date strings', async () => {
       const mockComments = {
-        items: [{
-          id: 1,
-          user_id: 'user1',
-          content: 'Test comment',
-          created_at: '2025-12-25T10:45:30Z',
-          updated_at: '2025-12-25T10:45:30Z',
-          author: { id: 'user1', name: 'John Doe', avatar: null }
-        }],
-        metadata: { totalItems: 1, currentPage: 1, pageSize: 10, totalPages: 1 }
+        items: [
+          {
+            id: 1,
+            user_id: 'user1',
+            content: 'Test comment',
+            created_at: '2025-12-25T10:45:30Z',
+            updated_at: '2025-12-25T10:45:30Z',
+            author: { id: 'user1', name: 'John Doe', avatar: null },
+          },
+        ],
+        metadata: {
+          totalItems: 1,
+          currentPage: 1,
+          pageSize: 10,
+          totalPages: 1,
+        },
       };
 
       vi.mocked(postsApi.getCommentsByPostId).mockResolvedValue(mockComments);
@@ -919,15 +1165,22 @@ vi.mock('../services/posts', () => ({
   describe('Accessibility', () => {
     it('should have accessible comment structure', async () => {
       const mockComments = {
-        items: [{
-          id: 1,
-          user_id: 'user1',
-          content: 'Test comment',
-          created_at: '2025-01-15T15:30:00Z',
-          updated_at: '2025-01-15T15:30:00Z',
-          author: { id: 'user1', name: 'John Doe', avatar: null }
-        }],
-        metadata: { totalItems: 1, currentPage: 1, pageSize: 10, totalPages: 1 }
+        items: [
+          {
+            id: 1,
+            user_id: 'user1',
+            content: 'Test comment',
+            created_at: '2025-01-15T15:30:00Z',
+            updated_at: '2025-01-15T15:30:00Z',
+            author: { id: 'user1', name: 'John Doe', avatar: null },
+          },
+        ],
+        metadata: {
+          totalItems: 1,
+          currentPage: 1,
+          pageSize: 10,
+          totalPages: 1,
+        },
       };
 
       vi.mocked(postsApi.getCommentsByPostId).mockResolvedValue(mockComments);
@@ -941,20 +1194,33 @@ vi.mock('../services/posts', () => ({
       const commentCard = document.querySelector('.comment-card');
       expect(commentCard).toBeInTheDocument();
       expect(commentCard?.querySelector('.comment-author')).toBeInTheDocument();
-      expect(commentCard?.querySelector('.comment-content')).toBeInTheDocument();
+      expect(
+        commentCard?.querySelector('.comment-content'),
+      ).toBeInTheDocument();
     });
 
     it('should have alt text for avatar images', async () => {
       const mockComments = {
-        items: [{
-          id: 1,
-          user_id: 'user1',
-          content: 'Test comment',
-          created_at: '2025-01-15T15:30:00Z',
-          updated_at: '2025-01-15T15:30:00Z',
-          author: { id: 'user1', name: 'John Doe', avatar: 'https://example.com/avatar.jpg' }
-        }],
-        metadata: { totalItems: 1, currentPage: 1, pageSize: 10, totalPages: 1 }
+        items: [
+          {
+            id: 1,
+            user_id: 'user1',
+            content: 'Test comment',
+            created_at: '2025-01-15T15:30:00Z',
+            updated_at: '2025-01-15T15:30:00Z',
+            author: {
+              id: 'user1',
+              name: 'John Doe',
+              avatar: 'https://example.com/avatar.jpg',
+            },
+          },
+        ],
+        metadata: {
+          totalItems: 1,
+          currentPage: 1,
+          pageSize: 10,
+          totalPages: 1,
+        },
       };
 
       vi.mocked(postsApi.getCommentsByPostId).mockResolvedValue(mockComments);
@@ -970,15 +1236,22 @@ vi.mock('../services/posts', () => ({
 
     it('should have disabled state properly indicated on buttons', async () => {
       const mockComments = {
-        items: [{
-          id: 1,
-          user_id: 'user1',
-          content: 'Test comment',
-          created_at: '2025-01-15T15:30:00Z',
-          updated_at: '2025-01-15T15:30:00Z',
-          author: { id: 'user1', name: 'John Doe', avatar: null }
-        }],
-        metadata: { totalItems: 20, currentPage: 1, pageSize: 10, totalPages: 2 }
+        items: [
+          {
+            id: 1,
+            user_id: 'user1',
+            content: 'Test comment',
+            created_at: '2025-01-15T15:30:00Z',
+            updated_at: '2025-01-15T15:30:00Z',
+            author: { id: 'user1', name: 'John Doe', avatar: null },
+          },
+        ],
+        metadata: {
+          totalItems: 20,
+          currentPage: 1,
+          pageSize: 10,
+          totalPages: 2,
+        },
       };
 
       vi.mocked(postsApi.getCommentsByPostId).mockResolvedValue(mockComments);
@@ -993,4 +1266,3 @@ vi.mock('../services/posts', () => ({
     });
   });
 });
-

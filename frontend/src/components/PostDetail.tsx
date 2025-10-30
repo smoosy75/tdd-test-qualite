@@ -102,7 +102,8 @@ export default function PostDetail() {
 
             <div className="post-stats">
               <span className="comment-count">
-                {post.commentCount} {post.commentCount === 1 ? 'comment' : 'comments'}
+                {post.commentCount}{' '}
+                {post.commentCount === 1 ? 'comment' : 'comments'}
               </span>
             </div>
           </div>

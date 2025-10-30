@@ -29,14 +29,14 @@ describe('PostDetail Component', () => {
         <Routes>
           <Route path="/posts/:id" element={<PostDetail />} />
         </Routes>
-      </MemoryRouter>
+      </MemoryRouter>,
     );
   };
 
   describe('Loading State', () => {
     it('should display loading spinner while fetching post', () => {
       vi.mocked(postsApi.getPostById).mockImplementation(
-        () => new Promise(() => {}) // Never resolves
+        () => new Promise(() => {}), // Never resolves
       );
 
       renderPostDetail('1');
@@ -46,7 +46,7 @@ describe('PostDetail Component', () => {
 
     it('should display "Loading post..." text', () => {
       vi.mocked(postsApi.getPostById).mockImplementation(
-        () => new Promise(() => {}) // Never resolves
+        () => new Promise(() => {}), // Never resolves
       );
 
       renderPostDetail('1');
@@ -65,7 +65,7 @@ describe('PostDetail Component', () => {
       created_at: '2025-01-15T15:30:00Z',
       updatedAt: '2025-01-15T15:30:00Z',
       commentCount: 5,
-      author: { id: 'user1', name: 'John Doe', avatar: null }
+      author: { id: 'user1', name: 'John Doe', avatar: null },
     };
 
     it('should render post title', async () => {
@@ -74,7 +74,9 @@ describe('PostDetail Component', () => {
       renderPostDetail('1');
 
       await waitFor(() => {
-        expect(screen.getByRole('heading', { level: 1, name: 'Test Post Title' })).toBeInTheDocument();
+        expect(
+          screen.getByRole('heading', { level: 1, name: 'Test Post Title' }),
+        ).toBeInTheDocument();
       });
     });
 
@@ -112,7 +114,9 @@ describe('PostDetail Component', () => {
         expect(screen.getByText('Test Post Title')).toBeInTheDocument();
       });
 
-      expect(document.querySelector('.post-detail-image')).not.toBeInTheDocument();
+      expect(
+        document.querySelector('.post-detail-image'),
+      ).not.toBeInTheDocument();
     });
 
     it('should display author name', async () => {
@@ -128,7 +132,10 @@ describe('PostDetail Component', () => {
     it('should display author avatar when available', async () => {
       const postWithAvatar = {
         ...mockPost,
-        author: { ...mockPost.author, avatar: 'https://example.com/avatar.jpg' }
+        author: {
+          ...mockPost.author,
+          avatar: 'https://example.com/avatar.jpg',
+        },
       };
       vi.mocked(postsApi.getPostById).mockResolvedValue(postWithAvatar);
 
@@ -147,7 +154,9 @@ describe('PostDetail Component', () => {
       renderPostDetail('1');
 
       await waitFor(() => {
-        const placeholder = document.querySelector('.post-author-avatar-placeholder');
+        const placeholder = document.querySelector(
+          '.post-author-avatar-placeholder',
+        );
         expect(placeholder).toBeInTheDocument();
         expect(placeholder).toHaveTextContent('J');
       });
@@ -159,7 +168,9 @@ describe('PostDetail Component', () => {
       renderPostDetail('1');
 
       await waitFor(() => {
-        expect(screen.getByText(/Created: January 15, 2025/)).toBeInTheDocument();
+        expect(
+          screen.getByText(/Created: January 15, 2025/),
+        ).toBeInTheDocument();
       });
     });
 
@@ -167,7 +178,7 @@ describe('PostDetail Component', () => {
       const modifiedPost = {
         ...mockPost,
         created_at: '2025-01-15T15:30:00Z',
-        updatedAt: '2025-01-16T10:00:00Z'
+        updatedAt: '2025-01-16T10:00:00Z',
       };
       vi.mocked(postsApi.getPostById).mockResolvedValue(modifiedPost);
 
@@ -259,7 +270,7 @@ describe('PostDetail Component', () => {
   describe('Error State', () => {
     it('should display error message when API call fails', async () => {
       vi.mocked(postsApi.getPostById).mockRejectedValue(
-        new Error('Failed to fetch post')
+        new Error('Failed to fetch post'),
       );
 
       renderPostDetail('1');
@@ -282,7 +293,7 @@ describe('PostDetail Component', () => {
 
     it('should display "Back to Posts" link in error state', async () => {
       vi.mocked(postsApi.getPostById).mockRejectedValue(
-        new Error('Failed to fetch post')
+        new Error('Failed to fetch post'),
       );
 
       renderPostDetail('1');
@@ -296,7 +307,7 @@ describe('PostDetail Component', () => {
 
     it('should not render Comments component on error', async () => {
       vi.mocked(postsApi.getPostById).mockRejectedValue(
-        new Error('Failed to fetch post')
+        new Error('Failed to fetch post'),
       );
 
       renderPostDetail('1');
@@ -305,7 +316,9 @@ describe('PostDetail Component', () => {
         expect(screen.getByText(/Error/)).toBeInTheDocument();
       });
 
-      expect(screen.queryByTestId('comments-component')).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId('comments-component'),
+      ).not.toBeInTheDocument();
     });
   });
 
@@ -319,7 +332,7 @@ describe('PostDetail Component', () => {
       created_at: '2025-01-15T15:30:00Z',
       updatedAt: '2025-01-15T15:30:00Z',
       commentCount: 0,
-      author: { id: 'user1', name: 'John Doe', avatar: null }
+      author: { id: 'user1', name: 'John Doe', avatar: null },
     };
 
     it('should extract post ID from URL params', async () => {
@@ -355,7 +368,7 @@ describe('PostDetail Component', () => {
           <Routes>
             <Route path="/posts/:id" element={<PostDetail />} />
           </Routes>
-        </MemoryRouter>
+        </MemoryRouter>,
       );
 
       await waitFor(() => {
@@ -367,7 +380,7 @@ describe('PostDetail Component', () => {
           <Routes>
             <Route path="/posts/:id" element={<PostDetail />} />
           </Routes>
-        </MemoryRouter>
+        </MemoryRouter>,
       );
 
       await waitFor(() => {
@@ -400,7 +413,7 @@ describe('PostDetail Component', () => {
       created_at: '2025-01-15T15:30:00Z',
       updatedAt: '2025-01-15T15:30:00Z',
       commentCount: 0,
-      author: { id: 'user1', name: 'John Doe', avatar: null }
+      author: { id: 'user1', name: 'John Doe', avatar: null },
     };
 
     it('should call postsApi.getPostById with post ID', async () => {
@@ -432,10 +445,10 @@ describe('PostDetail Component', () => {
           <Routes>
             <Route path="/posts/:id?" element={<PostDetail />} />
           </Routes>
-        </MemoryRouter>
+        </MemoryRouter>,
       );
 
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       expect(postsApi.getPostById).not.toHaveBeenCalled();
     });
@@ -452,7 +465,7 @@ describe('PostDetail Component', () => {
         created_at: '2025-01-15T15:30:00Z',
         updatedAt: '2025-01-15T15:30:00Z',
         commentCount: 0,
-        author: { id: 'user1', name: 'John Doe', avatar: null }
+        author: { id: 'user1', name: 'John Doe', avatar: null },
       };
 
       vi.mocked(postsApi.getPostById).mockResolvedValue(mockPost);
@@ -474,7 +487,7 @@ describe('PostDetail Component', () => {
         created_at: '2025-01-15T15:30:00Z',
         updatedAt: '2025-01-15T15:30:00Z',
         commentCount: 0,
-        author: { id: 'user1', name: 'John Doe', avatar: null }
+        author: { id: 'user1', name: 'John Doe', avatar: null },
       };
 
       vi.mocked(postsApi.getPostById).mockResolvedValue(mockPost);
@@ -497,7 +510,7 @@ describe('PostDetail Component', () => {
         created_at: '2025-12-25T10:45:30Z',
         updatedAt: '2025-12-25T10:45:30Z',
         commentCount: 0,
-        author: { id: 'user1', name: 'John Doe', avatar: null }
+        author: { id: 'user1', name: 'John Doe', avatar: null },
       };
 
       vi.mocked(postsApi.getPostById).mockResolvedValue(mockPost);
@@ -521,7 +534,7 @@ describe('PostDetail Component', () => {
         created_at: '2025-01-15T15:30:00Z',
         updatedAt: '2025-01-15T15:30:00Z',
         commentCount: 0,
-        author: { id: 'user1', name: 'John Doe', avatar: null }
+        author: { id: 'user1', name: 'John Doe', avatar: null },
       };
 
       vi.mocked(postsApi.getPostById).mockResolvedValue(mockPost);
@@ -544,7 +557,7 @@ describe('PostDetail Component', () => {
         created_at: '2025-01-15T15:30:00Z',
         updatedAt: '2025-01-15T15:30:00Z',
         commentCount: 0,
-        author: { id: 'user1', name: 'John Doe', avatar: null }
+        author: { id: 'user1', name: 'John Doe', avatar: null },
       };
 
       vi.mocked(postsApi.getPostById).mockResolvedValue(mockPost);
@@ -567,7 +580,7 @@ describe('PostDetail Component', () => {
         created_at: '2025-01-15T15:30:00Z',
         updatedAt: '2025-01-15T15:30:00Z',
         commentCount: 0,
-        author: { id: 'user1', name: 'John Doe', avatar: null }
+        author: { id: 'user1', name: 'John Doe', avatar: null },
       };
 
       vi.mocked(postsApi.getPostById).mockResolvedValue(mockPost);
@@ -592,7 +605,11 @@ describe('PostDetail Component', () => {
       created_at: '2025-01-15T15:30:00Z',
       updatedAt: '2025-01-15T15:30:00Z',
       commentCount: 0,
-      author: { id: 'user1', name: 'John Doe', avatar: 'https://example.com/avatar.jpg' }
+      author: {
+        id: 'user1',
+        name: 'John Doe',
+        avatar: 'https://example.com/avatar.jpg',
+      },
     };
 
     it('should use semantic HTML article tag for post', async () => {
@@ -601,7 +618,9 @@ describe('PostDetail Component', () => {
       renderPostDetail('1');
 
       await waitFor(() => {
-        expect(document.querySelector('article.post-detail')).toBeInTheDocument();
+        expect(
+          document.querySelector('article.post-detail'),
+        ).toBeInTheDocument();
       });
     });
 
@@ -611,7 +630,9 @@ describe('PostDetail Component', () => {
       renderPostDetail('1');
 
       await waitFor(() => {
-        expect(document.querySelector('header.post-detail-header')).toBeInTheDocument();
+        expect(
+          document.querySelector('header.post-detail-header'),
+        ).toBeInTheDocument();
       });
     });
 
@@ -622,7 +643,9 @@ describe('PostDetail Component', () => {
 
       await waitFor(() => {
         const images = screen.getAllByAltText('Test Post');
-        expect(images.some(img => img.getAttribute('src')?.includes('image.jpg'))).toBe(true);
+        expect(
+          images.some((img) => img.getAttribute('src')?.includes('image.jpg')),
+        ).toBe(true);
       });
     });
 
@@ -644,7 +667,9 @@ describe('PostDetail Component', () => {
       renderPostDetail('1');
 
       await waitFor(() => {
-        expect(screen.getByRole('heading', { level: 1, name: 'Test Post' })).toBeInTheDocument();
+        expect(
+          screen.getByRole('heading', { level: 1, name: 'Test Post' }),
+        ).toBeInTheDocument();
       });
     });
   });
@@ -661,7 +686,7 @@ describe('PostDetail Component', () => {
         created_at: '2025-01-15T15:30:00Z',
         updatedAt: '2025-01-15T15:30:00Z',
         commentCount: 0,
-        author: { id: 'user1', name: 'John Doe', avatar: null }
+        author: { id: 'user1', name: 'John Doe', avatar: null },
       };
 
       vi.mocked(postsApi.getPostById).mockResolvedValue(mockPost);
@@ -683,7 +708,7 @@ describe('PostDetail Component', () => {
         created_at: '2025-01-15T15:30:00Z',
         updatedAt: '2025-01-15T15:30:00Z',
         commentCount: 0,
-        author: { id: 'user1', name: 'John Doe', avatar: null }
+        author: { id: 'user1', name: 'John Doe', avatar: null },
       };
 
       vi.mocked(postsApi.getPostById).mockResolvedValue(mockPost);
@@ -705,7 +730,7 @@ describe('PostDetail Component', () => {
         created_at: '2025-01-15T15:30:00Z',
         updatedAt: '2025-01-15T15:30:00Z',
         commentCount: 0,
-        author: { id: 'user1', name: '', avatar: null }
+        author: { id: 'user1', name: '', avatar: null },
       };
 
       vi.mocked(postsApi.getPostById).mockResolvedValue(mockPost);
@@ -719,7 +744,7 @@ describe('PostDetail Component', () => {
 
     it('should handle invalid post ID gracefully', async () => {
       vi.mocked(postsApi.getPostById).mockRejectedValue(
-        new Error('Invalid post ID')
+        new Error('Invalid post ID'),
       );
 
       renderPostDetail('invalid');
@@ -730,4 +755,3 @@ describe('PostDetail Component', () => {
     });
   });
 });
-

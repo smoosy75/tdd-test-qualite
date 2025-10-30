@@ -42,7 +42,9 @@ export default function PostsList() {
     const div = document.createElement('div');
     div.innerHTML = html;
     const text = div.textContent || div.innerText || '';
-    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+    return text.length > maxLength
+      ? text.substring(0, maxLength) + '...'
+      : text;
   };
 
   if (loading) {
@@ -129,7 +131,8 @@ export default function PostsList() {
 
                 <div className="post-card-meta">
                   <span className="post-card-comments">
-                    {post.commentCount} {post.commentCount === 1 ? 'comment' : 'comments'}
+                    {post.commentCount}{' '}
+                    {post.commentCount === 1 ? 'comment' : 'comments'}
                   </span>
                 </div>
               </div>

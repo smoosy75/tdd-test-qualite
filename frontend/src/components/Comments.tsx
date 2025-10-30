@@ -23,7 +23,9 @@ export default function Comments({ postId }: CommentsProps) {
         setComments(response.items);
         setTotalPages(response.metadata.totalPages);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load comments');
+        setError(
+          err instanceof Error ? err.message : 'Failed to load comments',
+        );
       } finally {
         setLoading(false);
       }
@@ -90,7 +92,9 @@ export default function Comments({ postId }: CommentsProps) {
                   </div>
                 )}
                 <div className="comment-author-info">
-                  <span className="comment-author-name">{comment.author.name}</span>
+                  <span className="comment-author-name">
+                    {comment.author.name}
+                  </span>
                   <span className="comment-date">
                     {formatDate(comment.created_at)}
                   </span>

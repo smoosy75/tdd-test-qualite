@@ -1,7 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
-import PostsList from "@/components/PostsList";
-import PostDetail from "@/components/PostDetail";
-import Navbar from "@/components/navbar";
+import PostsList from '@/components/PostsList';
+import PostDetail from '@/components/PostDetail';
+import Navbar from '@/components/navbar';
 import LoginPage from './pages/loginPage.tsx';
 import ProfilePage from './pages/profilPage.tsx/profilPage';
 
