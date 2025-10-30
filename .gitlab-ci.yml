@@ -131,7 +131,7 @@ lighthouse_ci:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
 
- # ---------- SONARQUBE ANALYSIS ----------
+  # ---------- SONARQUBE ANALYSIS ----------
 sonarqube_backend:
   stage: performance
   image:
@@ -190,7 +190,7 @@ sonarqube_frontend:
       -Dsonar.typescript.tsconfigPaths=frontend/tsconfig.json*
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'*
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "feature/load-test")'
 
 # # ---------- BUILD ----------
 # Backend Build
