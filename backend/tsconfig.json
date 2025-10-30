@@ -17,8 +17,9 @@
     /* === Autres === */
     "forceConsistentCasingInFileNames": true,
     "sourceMap": true,
-    "noImplicitAny": false
+    "noImplicitAny": false,
+    "typeRoots": ["./node_modules/@types", "./src/types"]
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "src"],
   "exclude": ["node_modules", "dist"]
 }
