@@ -10,10 +10,6 @@ stages:
 
 variables:
   NODE_ENV: test
-  # DinD-friendly defaults (safe to set globally)
-  DOCKER_TLS_CERTDIR: ""
-  DOCKER_HOST: tcp://docker:2375
-  DOCKER_DRIVER: overlay2
 
 # ---------- LINT / FORMAT ----------
 backend_lint_format:
