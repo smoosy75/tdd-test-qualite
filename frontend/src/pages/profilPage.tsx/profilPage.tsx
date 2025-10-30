@@ -39,6 +39,8 @@ export default function ProfilePage() {
   const [posts, setPosts] = useState<PostItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [newName, setNewName] = useState("");
 
   useEffect(() => {
     let cancelled = false;
@@ -50,6 +52,7 @@ export default function ProfilePage() {
         const u: User = await resUser.json();
         if (cancelled) return;
         setUser(u);
+        setNewName(u.username);
 
         const resPosts = await fetch(`/api/posts?authorId=${u.id}`);
         if (!resPosts.ok) throw new Error("Impossible de charger les posts");
@@ -62,6 +65,7 @@ export default function ProfilePage() {
           setError(message || "Erreur inconnue");
           setUser(MOCK_USER);
           setPosts(MOCK_POSTS);
+          setNewName(MOCK_USER.username);
         }
       } finally {
         if (!cancelled) setLoading(false);
@@ -73,6 +77,24 @@ export default function ProfilePage() {
     };
   }, []);
 
+  const handleSave = async () => {
+    if (!user) return;
+    try {
+      const res = await fetch("/api/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: newName }),
+      });
+      if (!res.ok) throw new Error("Erreur lors de la sauvegarde");
+      const updated = await res.json();
+      setUser(updated);
+      setIsEditing(false);
+    } catch (err) {
+      console.error(err);
+      setError("Impossible de sauvegarder le profil");
+    }
+  };
+
   if (loading) return <p>Chargement…</p>;
   if (!user) return null;
 
@@ -80,9 +102,31 @@ export default function ProfilePage() {
     <div className="profile">
       <header className="profile-header">
         <img src={user.avatar} alt="Avatar" className="avatar" />
+
         <div className="profile-info">
-          <h1 className="username">{user.username}</h1>
-          <p className="email">{user.email}</p>
+          {isEditing ? (
+            <>
+              <input
+                aria-label="Nom d’utilisateur"
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+              />
+              <button onClick={handleSave}>Sauvegarder</button>
+              <button onClick={() => setIsEditing(false)}>Annuler</button>
+            </>
+          ) : (
+            <>
+              <h1 className="username">{user.username}</h1>
+              <p className="email">{user.email}</p>
+              <button
+                onClick={() => setIsEditing(true)}
+                aria-label="Modifier le profil"
+                className="edit-button"
+              >
+                Modifier
+              </button>
+            </>
+          )}
         </div>
       </header>
 
@@ -93,17 +137,15 @@ export default function ProfilePage() {
       )}
 
       <section aria-label="Mes posts" className="posts">
-        <div>
-          <h2>Mes posts</h2>
-          {posts.length === 0 && <p>Aucun post pour le moment.</p>}
-          <div className="post-list">
-            {posts.map((p) => (
-              <article key={p.id} className="post">
-                {p.title && <h3 className="post-title">{p.title}</h3>}
-                {p.body && <p className="post-body">{p.body}</p>}
-              </article>
-            ))}
-          </div>
+        <h2>Mes posts</h2>
+        {posts.length === 0 && <p>Aucun post pour le moment.</p>}
+        <div className="post-list">
+          {posts.map((p) => (
+            <article key={p.id} className="post">
+              {p.title && <h3 className="post-title">{p.title}</h3>}
+              {p.body && <p className="post-body">{p.body}</p>}
+            </article>
+          ))}
         </div>
       </section>
     </div>
