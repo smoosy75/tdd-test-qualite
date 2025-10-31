@@ -41,13 +41,39 @@ sast_semgrep:
     entrypoint: [""]
   before_script:
     - rm -rf /src && mkdir -p /src
-    # copy project into /src, excluding .git and node_modules
+    # copy project into /src excluding .git and node_modules
     - tar --exclude='.git' --exclude='node_modules' -C "$CI_PROJECT_DIR" -cf - . | tar -C /src -xf -
+    - ls -la /src | head -n 50
   script:
-    - semgrep scan --config p/security-audit --metrics=off /src
+    # run semgrep, capture output
+    - semgrep scan --config p/security-audit --metrics=off /src --verbose | tee semgrep.out
+    # show the last lines for quick glance
+    - tail -n 40 semgrep.out || true
+    # fail if findings != 0 (semgrep prints "Findings: N")
+    - |
+      if ! grep -qE "^ • Findings: 0 \\(0 blocking\\)" semgrep.out; then
+        echo "Semgrep found issues — failing the job."
+        sed -n '1,200p' semgrep.out
+        exit 1
+      fi
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "test/demo")'
+
+# sast_semgrep:
+#   stage: security
+#   image:
+#     name: returntocorp/semgrep:latest
+#     entrypoint: [""]
+#   before_script:
+#     - rm -rf /src && mkdir -p /src
+#     # copy project into /src, excluding .git and node_modules
+#     - tar --exclude='.git' --exclude='node_modules' -C "$CI_PROJECT_DIR" -cf - . | tar -C /src -xf -
+#   script:
+#     - semgrep scan --config p/security-audit --metrics=off /src
+#   rules:
+#     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+#     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "test/demo")'
 
 # ---------- LINT / FORMAT ----------
 backend_lint_format:
