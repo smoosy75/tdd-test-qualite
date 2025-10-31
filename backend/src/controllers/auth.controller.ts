@@ -2,11 +2,8 @@ import { Request, Response } from 'express';
 import { IUserService } from '../services/userService';
 
 export class AuthController {
-  
-  constructor(
-      private userService: IUserService
-    ) {}
-  
+  constructor(private userService: IUserService) {}
+
   async signup(req: Request, res: Response): Promise<Response> {
     const { email, username, password } = req.body;
 
@@ -35,7 +32,9 @@ export class AuthController {
         stack: error?.stack,
       });
 
-      return res.status(500).json({ message: error.message || 'Erreur interne' });
+      return res
+        .status(500)
+        .json({ message: error.message || 'Erreur interne' });
     }
   }
 

@@ -21,13 +21,16 @@ export interface IUserService {
   getUserById(id: string): Promise<RecordModel | null>;
   getUsersByIds(ids: string[]): Promise<Array<RecordModel>>;
   createUser(signup: UserSignup): Promise<CreatedUser>;
-  signInUser(email: string, password: string): Promise<{ user: any; token: string }>;
+  signInUser(
+    email: string,
+    password: string
+  ): Promise<{ user: any; token: string }>;
   validateToken(token: string): Promise<AuthRecord | null>;
 }
 
 export class UserService implements IUserService {
   constructor(private pb: Client) {
-    console.log(process.env.POCKETBASE_URL)
+    console.log(process.env.POCKETBASE_URL);
   }
 
   async getUserById(id: string): Promise<RecordModel | null> {
@@ -69,7 +72,7 @@ export class UserService implements IUserService {
    */
   public async createUser(signup: UserSignup): Promise<CreatedUser> {
     try {
-      const recordModel = await this.pb.collection("users").create({
+      const recordModel = await this.pb.collection('users').create({
         email: signup.email,
         password: signup.password,
         passwordConfirm: signup.password,
@@ -82,8 +85,11 @@ export class UserService implements IUserService {
         username: recordModel.username,
       };
     } catch (error: any) {
-      console.error("Error creating user in PocketBase:", error?.message || error);
-      throw new Error(error?.message || "Failed to create user");
+      console.error(
+        'Error creating user in PocketBase:',
+        error?.message || error
+      );
+      throw new Error(error?.message || 'Failed to create user');
     }
   }
 
@@ -93,22 +99,26 @@ export class UserService implements IUserService {
    * @param password - user's password
    * @returns {Promise<{ user: any, token: string }>} - user record and JWT token
    */
-  async signInUser(email: string, password: string): Promise<{ user: any; token: string }> {
+  async signInUser(
+    email: string,
+    password: string
+  ): Promise<{ user: any; token: string }> {
     try {
       // Authenticate with PocketBase using identity (email) + password
-      const authData = await this.pb.collection("users").authWithPassword(email, password);
+      const authData = await this.pb
+        .collection('users')
+        .authWithPassword(email, password);
 
       // authData includes both token and user record
       const token = authData.token;
       const user = authData.record;
 
-      console.log("User signed in:", user.email);
+      console.log('User signed in:', user.email);
 
       return { user, token };
-    } 
-    catch (err: any) {
-      console.error("Login failed:", err.message);
-      throw new Error("Invalid email or password");
+    } catch (err: any) {
+      console.error('Login failed:', err.message);
+      throw new Error('Invalid email or password');
     }
   }
 
@@ -123,13 +133,12 @@ export class UserService implements IUserService {
       this.pb.authStore.save(token, null);
 
       // Check if the token is still valid
-      await this.pb.collection("users").authRefresh(); // refreshes user session
+      await this.pb.collection('users').authRefresh(); // refreshes user session
 
       // If successful, pb.authStore.model contains the user record
       return this.pb.authStore.record;
-    } 
-    catch (err: any) {
-      console.error("Token validation failed:", err?.message || err);
+    } catch (err: any) {
+      console.error('Token validation failed:', err?.message || err);
       return null;
     }
   }
