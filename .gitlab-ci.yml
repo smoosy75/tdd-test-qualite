@@ -40,8 +40,8 @@ sast_semgrep:
     name: returntocorp/semgrep:latest
     entrypoint: [""]
   before_script:
-    - ln -s "$CI_PROJECT_DIR" /src || true
-    - cd /src
+    - rm -rf /src && mkdir -p /src
+    - rsync -a --delete --exclude '.git' --exclude 'node_modules' "$CI_PROJECT_DIR"/ /src/
   script:
     - semgrep scan --config p/ci --metrics=off
   rules:
