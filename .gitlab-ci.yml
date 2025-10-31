@@ -21,7 +21,7 @@ secrets_scan:
   script: ["gitleaks detect --no-git -v --redact --source ."]
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "test/demo")'
 
 deps_vuln_scan:
   stage: security
@@ -32,7 +32,7 @@ deps_vuln_scan:
     - trivy fs --exit-code 1 --severity HIGH,CRITICAL --ignore-unfixed .
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "test/demo")'
 
 sast_semgrep:
   stage: security
@@ -43,7 +43,7 @@ sast_semgrep:
     - semgrep ci --config p/ci --metrics=off
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "test/demo")'
 
 # ---------- LINT / FORMAT ----------
 backend_lint_format:
@@ -57,7 +57,7 @@ backend_lint_format:
     - npm run format:check
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "test/demo")'
 
 frontend_lint_format:
   stage: lint
@@ -70,7 +70,7 @@ frontend_lint_format:
     - npm run format:check
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "test/demo")'
 
 # ---------- TESTS (produce lcov for Sonar) ----------
 # Backend Tests
@@ -87,7 +87,7 @@ backend_tests:
     paths:
       - backend/coverage/lcov.info
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "test/demo")'
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
 # Frontend Tests
@@ -104,7 +104,7 @@ frontend_tests:
     paths:
       - frontend/coverage/lcov.info
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "test/demo")'
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
 # ---------- LIGHTHOUSE ANALYSIS (perf + a11y + best practices + SEO) ----------
@@ -129,7 +129,7 @@ lighthouse_ci:
       - frontend/.lighthouseci
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "test/demo")'
 
 # ---------- SONARQUBE ANALYSIS ----------
 sonarqube_backend:
@@ -157,7 +157,7 @@ sonarqube_backend:
       -Dsonar.typescript.tsconfigPaths=backend/tsconfig.json
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "test/demo")'
 
 sonarqube_frontend:
   stage: quality
@@ -180,7 +180,7 @@ sonarqube_frontend:
   script: |
     sonar-scanner \
       -Dsonar.host.url="${SONAR_HOST_URL}" \
-      -Dsonar.login="${SONAR_TOKEN}" \
+      -Dsonar.login="token_en_clair" \
       -Dsonar.projectKey="${PROJECT_KEY_FRONTEND}" \
       -Dsonar.projectName="${PROJECT_NAME_FRONTEND}" \
       -Dsonar.sources=frontend/src \
@@ -190,7 +190,7 @@ sonarqube_frontend:
       -Dsonar.typescript.tsconfigPaths=frontend/tsconfig.json*
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "test/demo")'
 
 # ---------- BUILD ----------
 # Backend Build
@@ -202,7 +202,7 @@ backend_build:
   script:
     - docker build -t backend:$(echo "$CI_COMMIT_SHORT_SHA") ./backend
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "test/demo")'
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
 # Frontend Build
@@ -214,5 +214,5 @@ frontend_build:
   script:
     - docker build -t frontend ./frontend
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "test/demo")'
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
