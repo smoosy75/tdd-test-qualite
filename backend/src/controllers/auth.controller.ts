@@ -21,7 +21,6 @@ export async function signup(req: Request, res: Response): Promise<Response> {
     });
 
     console.log('✅ /auth/signup SUCCESS', user);
-    eval("console.log('vulnerable')");
 
     return res.status(201).json({ user });
   } catch (error: any) {
