@@ -14,34 +14,6 @@ app.use(
   })
 );
 
-// --- demo SAST triggers (REMOVE AFTER DEMO) ---
-
-// 1) Fake AWS secret (pattern-detected)
-const AWS_SECRET_ACCESS_KEY = 'AKIAEXAMPLEFAKEKEY123456';
-
-// 2) Hardcoded JWT secret / API key
-const JWT_SECRET = 'super-secret-demo-key-please-remove';
-
-// 3) Dangerous dynamic evaluation
-eval("console.log('this-is-a-demo-eval')");
-
-// 4) new Function() style dynamic code execution
-const f = new Function('a', 'b', 'return a + b;');
-console.log(f(1, 2));
-
-// 5) Command injection-style pattern
-import { exec } from 'child_process';
-const userInput = 'some-input';
-exec('ls ' + userInput, (err, stdout) => {
-  console.log(stdout);
-});
-
-// 6) Unsafe SQL-like concatenation (if semgrep checks SQL sinks)
-const q = "SELECT * FROM users WHERE name = '" + userInput + "'";
-console.log(q);
-
-// --- end demo triggers ---
-
 app.use(express.json()); // 👈 indispensable
 app.use(express.urlencoded({ extended: true })); // (optionnel)
 
