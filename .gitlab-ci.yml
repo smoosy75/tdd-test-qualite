@@ -147,7 +147,7 @@ sonarqube_backend:
   script: |
     sonar-scanner \
       -Dsonar.host.url="${SONAR_HOST_URL}" \
-      -Dsonar.login=5aeb7e79b8a03f5847737ec7440606c6763110ba \
+      -Dsonar.login="${SONAR_TOKEN}" \
       -Dsonar.projectKey="${PROJECT_KEY_BACKEND}" \
       -Dsonar.projectName="${PROJECT_NAME_BACKEND}" \
       -Dsonar.sources=backend/src \
