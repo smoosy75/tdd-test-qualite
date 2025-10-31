@@ -17,7 +17,8 @@
     /* === Autres === */
     "forceConsistentCasingInFileNames": true,
     "sourceMap": true,
-    "noImplicitAny": false
+    "noImplicitAny": false,
+    "typeRoots": ["./node_modules/@types", "./src/types"]
   },
   "ts-node": {
     "esm": true,

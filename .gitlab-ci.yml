@@ -1,4 +1,9 @@
+default:
+  tags:
+    - bardanmi
+
 stages:
+  - security
   - lint
   - test
   - quality
@@ -6,6 +11,39 @@ stages:
 
 variables:
   NODE_ENV: test
+
+# ---------- SECURITY ----------
+secrets_scan:
+  stage: security
+  image:
+    name: zricethezav/gitleaks:latest
+    entrypoint: [""]
+  script: ["gitleaks detect --no-git -v --redact --source ."]
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
+
+deps_vuln_scan:
+  stage: security
+  image:
+    name: aquasec/trivy:latest
+    entrypoint: [""]
+  script:
+    - trivy fs --exit-code 1 --severity HIGH,CRITICAL --ignore-unfixed .
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
+
+sast_semgrep:
+  stage: security
+  image:
+    name: returntocorp/semgrep:latest
+    entrypoint: [""]
+  script:
+    - semgrep ci --config p/ci --metrics=off
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
 
 # ---------- LINT / FORMAT ----------
 backend_lint_format:
@@ -68,6 +106,30 @@ frontend_tests:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+
+# ---------- LIGHTHOUSE ANALYSIS (perf + a11y + best practices + SEO) ----------
+lighthouse_ci:
+  stage: quality
+  image: node:20-bullseye
+  needs: ["frontend_tests"]
+  before_script:
+    - cd frontend
+    - npm ci --no-audit --no-fund
+    - npm run build # Vite -> dist/
+    - npm i -g @lhci/cli
+    - apt-get update && apt-get install -y chromium
+    # Tell LHCI which Chrome to use (Debian path)
+    - export CHROME_PATH=/usr/bin/chromium
+  script:
+    # Run LHCI against the static build; fail on recommended assertions (checkout lighthouserc.json)
+    - lhci autorun
+  artifacts:
+    when: always
+    paths:
+      - frontend/.lighthouseci
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev")'
 
 # ---------- SONARQUBE ANALYSIS ----------
 sonarqube_backend:
