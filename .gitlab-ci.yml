@@ -44,7 +44,7 @@ sast_semgrep:
     # copy project into /src, excluding .git and node_modules
     - tar --exclude='.git' --exclude='node_modules' -C "$CI_PROJECT_DIR" -cf - . | tar -C /src -xf -
   script:
-    - semgrep scan --config p/javascript --metrics=off /src
+    - semgrep scan --config p/security-audit --metrics=off /src
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "test/demo")'
