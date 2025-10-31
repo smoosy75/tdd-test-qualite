@@ -13,6 +13,7 @@ export default function Comments({ postId }: CommentsProps) {
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
     const fetchComments = async () => {
@@ -32,7 +33,7 @@ export default function Comments({ postId }: CommentsProps) {
     };
 
     fetchComments();
-  }, [postId, page]);
+  }, [postId, page, retryCount]);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -58,7 +59,14 @@ export default function Comments({ postId }: CommentsProps) {
     return (
       <div className="comments-error">
         <p>Error: {error}</p>
-        <button onClick={() => setPage(1)}>Try Again</button>
+        <button
+          onClick={() => {
+            setPage(1);
+            setRetryCount((prev) => prev + 1);
+          }}
+        >
+          Try Again
+        </button>
       </div>
     );
   }

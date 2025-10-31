@@ -24,10 +24,7 @@ describe('Comments Component', () => {
 
       render(<Comments postId={1} />);
 
-      expect(
-        screen.getByRole('alert', { busy: true }) ||
-          screen.getByText('Loading comments...'),
-      ).toBeInTheDocument();
+      expect(screen.getByText('Loading comments...')).toBeInTheDocument();
       expect(document.querySelector('.spinner')).toBeInTheDocument();
     });
 
@@ -588,7 +585,9 @@ describe('Comments Component', () => {
         },
       };
 
-      vi.mocked(postsApi.getCommentsByPostId).mockResolvedValue(mockComments);
+      vi.mocked(postsApi.getCommentsByPostId).mockResolvedValueOnce(
+        mockComments,
+      );
 
       render(<Comments postId={1} />);
 

@@ -10,6 +10,7 @@ export default function PostsList() {
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -27,7 +28,7 @@ export default function PostsList() {
     };
 
     fetchPosts();
-  }, [page]);
+  }, [page, retryCount]);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -61,18 +62,15 @@ export default function PostsList() {
       <div className="posts-error">
         <h2>Error</h2>
         <p>{error}</p>
-        <button onClick={() => setPage(1)} className="retry-btn">
+        <button
+          onClick={() => {
+            setPage(1);
+            setRetryCount((prev) => prev + 1);
+          }}
+          className="retry-btn"
+        >
           Try Again
         </button>
-      </div>
-    );
-  }
-
-  if (posts.length === 0) {
-    return (
-      <div className="posts-empty">
-        <h2>No Posts Found</h2>
-        <p>There are no posts to display yet.</p>
       </div>
     );
   }
@@ -84,7 +82,13 @@ export default function PostsList() {
         <p>Discover and read the latest posts from our community</p>
       </header>
 
-      <div className="posts-grid">
+      {posts.length === 0 ? (
+        <div className="posts-empty">
+          <h2>No Posts Found</h2>
+          <p>There are no posts to display yet.</p>
+        </div>
+      ) : (
+        <div className="posts-grid">
         {posts.map((post) => (
           <article key={post.id} className="post-card">
             {post.imageUrl && (
@@ -143,7 +147,8 @@ export default function PostsList() {
             </div>
           </article>
         ))}
-      </div>
+        </div>
+      )}
 
       {totalPages > 1 && (
         <div className="posts-pagination">

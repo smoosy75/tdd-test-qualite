@@ -362,11 +362,10 @@ describe('PostDetail Component', () => {
       const post1 = { ...mockPost, id: 1, title: 'Post 1' };
       const post2 = { ...mockPost, id: 2, title: 'Post 2' };
 
-      vi.mocked(postsApi.getPostById)
-        .mockResolvedValueOnce(post1)
-        .mockResolvedValueOnce(post2);
+      // Test first post ID
+      vi.mocked(postsApi.getPostById).mockResolvedValueOnce(post1);
 
-      const { rerender } = render(
+      const { unmount } = render(
         <MemoryRouter initialEntries={['/posts/1']}>
           <Routes>
             <Route path="/posts/:id" element={<PostDetail />} />
@@ -378,7 +377,12 @@ describe('PostDetail Component', () => {
         expect(screen.getByText('Post 1')).toBeInTheDocument();
       });
 
-      rerender(
+      unmount();
+
+      // Test second post ID
+      vi.mocked(postsApi.getPostById).mockResolvedValueOnce(post2);
+
+      render(
         <MemoryRouter initialEntries={['/posts/2']}>
           <Routes>
             <Route path="/posts/:id" element={<PostDetail />} />
