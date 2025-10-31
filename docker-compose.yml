@@ -3,17 +3,21 @@ services:
   pocketbase:
     image: elestio/pocketbase:latest
     container_name: pocketbase
+    networks:
+      my-network:
+        aliases:
+          - pocketbase
     ports:
       - "8090:8090"
     volumes:
       - ./pb_data:/pb_data
-      # - ./pb_migrations:/pb_migrations
-    # entrypoint: ["/usr/local/bin/pocketbase", "serve", "--http=0.0.0.0:8090"]
 
   #  Base de données (PostgreSQL)
   db:
     image: postgres:15
     container_name: forum-db
+    networks:
+      - my-network
     environment:
       POSTGRES_USER: forum
       POSTGRES_PASSWORD: forum
@@ -28,23 +32,25 @@ services:
     build:
       context: ./backend
     container_name: backend
+    networks:
+      - my-network
     command: npm run dev
     ports:
       - "3000:3000"
     environment:
       DATABASE_URL: postgres://forum:forum@db:5432/forum_db
-      POCKETBASE_URL: http://pocketbase:8090
+      POCKETBASE_URL: http://127.0.0.1:8090
     depends_on:
       - db
       - pocketbase
-    volumes:
-      - ./backend:/app
 
   #  Frontend (Vite + React)
   frontend:
     build:
       context: ./frontend
     container_name: frontend
+    networks:
+      - my-network
     ports:
       - "5173:80"
     depends_on:
@@ -55,3 +61,8 @@ services:
 # volume pour PostgreSQL
 volumes:
   db_data:
+
+networks:
+  my-network:
+    # Specify driver options
+    driver: bridge

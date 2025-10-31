@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import pocketbase from '../services/pocketbase.service';
+import { UserService } from '../services/userService';
+import pb from '../services/pb';
 
 export default async function authGuard(
   req: Request,
@@ -14,7 +15,8 @@ export default async function authGuard(
 
   try {
     // vérifie le token via PocketBase
-    const user = await pocketbase.validateToken(token);
+    const userService = new UserService(pb);
+    const user = await userService.validateToken(token);
 
     if (!user) {
       return res.status(401).json({ message: 'Unauthorized' });
