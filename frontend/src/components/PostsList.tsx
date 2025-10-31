@@ -89,64 +89,64 @@ export default function PostsList() {
         </div>
       ) : (
         <div className="posts-grid">
-        {posts.map((post) => (
-          <article key={post.id} className="post-card">
-            {post.imageUrl && (
-              <Link to={`/posts/${post.id}`} className="post-card-image-link">
-                <img
-                  src={post.imageUrl}
-                  alt={post.title}
-                  className="post-card-image"
-                />
-              </Link>
-            )}
+          {posts.map((post) => (
+            <article key={post.id} className="post-card">
+              {post.imageUrl && (
+                <Link to={`/posts/${post.id}`} className="post-card-image-link">
+                  <img
+                    src={post.imageUrl}
+                    alt={post.title}
+                    className="post-card-image"
+                  />
+                </Link>
+              )}
 
-            <div className="post-card-content">
-              <Link to={`/posts/${post.id}`} className="post-card-title-link">
-                <h2 className="post-card-title">{post.title}</h2>
-              </Link>
+              <div className="post-card-content">
+                <Link to={`/posts/${post.id}`} className="post-card-title-link">
+                  <h2 className="post-card-title">{post.title}</h2>
+                </Link>
 
-              <p className="post-card-excerpt">
-                {truncateContent(post.content)}
-              </p>
+                <p className="post-card-excerpt">
+                  {truncateContent(post.content)}
+                </p>
 
-              <div className="post-card-footer">
-                <div className="post-card-author">
-                  {post.author.avatar ? (
-                    <img
-                      src={post.author.avatar}
-                      alt={post.author.name}
-                      className="post-card-avatar"
-                    />
-                  ) : (
-                    <div className="post-card-avatar-placeholder">
-                      {post.author.name.charAt(0).toUpperCase()}
+                <div className="post-card-footer">
+                  <div className="post-card-author">
+                    {post.author.avatar ? (
+                      <img
+                        src={post.author.avatar}
+                        alt={post.author.name}
+                        className="post-card-avatar"
+                      />
+                    ) : (
+                      <div className="post-card-avatar-placeholder">
+                        {post.author.name.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                    <div className="post-card-author-info">
+                      <span className="post-card-author-name">
+                        {post.author.name}
+                      </span>
+                      <span className="post-card-date">
+                        {formatDate(post.created_at)}
+                      </span>
                     </div>
-                  )}
-                  <div className="post-card-author-info">
-                    <span className="post-card-author-name">
-                      {post.author.name}
-                    </span>
-                    <span className="post-card-date">
-                      {formatDate(post.created_at)}
+                  </div>
+
+                  <div className="post-card-meta">
+                    <span className="post-card-comments">
+                      {post.commentCount}{' '}
+                      {post.commentCount === 1 ? 'comment' : 'comments'}
                     </span>
                   </div>
                 </div>
 
-                <div className="post-card-meta">
-                  <span className="post-card-comments">
-                    {post.commentCount}{' '}
-                    {post.commentCount === 1 ? 'comment' : 'comments'}
-                  </span>
-                </div>
+                <Link to={`/posts/${post.id}`} className="post-card-read-more">
+                  Read more →
+                </Link>
               </div>
-
-              <Link to={`/posts/${post.id}`} className="post-card-read-more">
-                Read more →
-              </Link>
-            </div>
-          </article>
-        ))}
+            </article>
+          ))}
         </div>
       )}
 
