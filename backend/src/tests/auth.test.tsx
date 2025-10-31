@@ -149,7 +149,9 @@ describe('Auth Controller', () => {
       await login(mockReq as Request, mockRes as Response);
 
       expect(mockStatus).toHaveBeenCalledWith(401);
-      expect(mockJson).toHaveBeenCalledWith({ message: 'Identifiants invalides' });
+      expect(mockJson).toHaveBeenCalledWith({
+        message: 'Identifiants invalides',
+      });
     });
 
     it('should return 404 when user is not found', async () => {
@@ -165,7 +167,9 @@ describe('Auth Controller', () => {
       await login(mockReq as Request, mockRes as Response);
 
       expect(mockStatus).toHaveBeenCalledWith(404);
-      expect(mockJson).toHaveBeenCalledWith({ message: 'Utilisateur introuvable' });
+      expect(mockJson).toHaveBeenCalledWith({
+        message: 'Utilisateur introuvable',
+      });
     });
 
     it('should return 500 for unexpected errors', async () => {
