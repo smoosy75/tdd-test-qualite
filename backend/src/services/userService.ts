@@ -26,7 +26,9 @@ export interface IUserService {
 }
 
 export class UserService implements IUserService {
-  constructor(private pb: Client) {}
+  constructor(private pb: Client) {
+    console.log(process.env.POCKETBASE_URL)
+  }
 
   async getUserById(id: string): Promise<RecordModel | null> {
     try {

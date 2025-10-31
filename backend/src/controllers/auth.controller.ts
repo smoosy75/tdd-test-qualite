@@ -50,7 +50,7 @@ export class AuthController {
     try {
       console.log('➡️ /auth/login START', { identity });
 
-      const result = await pocketbaseService.login(identity, password);
+      const result = await this.userService.signInUser(identity, password);
 
       console.log('✅ /auth/login SUCCESS', result.user);
 
