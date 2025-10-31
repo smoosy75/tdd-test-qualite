@@ -1,103 +1,237 @@
-# TDD-test-qualité
+# 🧪 **Tests & Quality – Project Overview**
 
-## Getting started
-
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
-
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
-
-## Add your files
-
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
-
-```
-cd existing_repo
-git remote add origin https://gitlab.com/smoosy75/tdd-test-qualite.git
-git branch -M main
-git push -uf origin main
-```
-
-## Integrate with your tools
-
-- [ ] [Set up project integrations](https://gitlab.com/smoosy75/tdd-test-qualite/-/settings/integrations)
-
-## Collaborate with your team
-
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
-
-## Test and Deploy
-
-Use the built-in continuous integration in GitLab.
-
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+This mini-project is set up to **guard code quality end-to-end**: secret leaks, dependency vulnerabilities, static analysis (SAST), lint/format, unit tests (front & back), Lighthouse (web quality), SonarQube, and Docker builds.  
+Below you’ll find **how to run everything locally** and a **plain-English tour of the GitLab CI pipeline** so you know exactly what each job does and how it helps.
 
 ---
 
-# Editing this README
+## 🗂️ **1) Repo at a glance**
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+```
+.
+├─ backend/        # Express + TypeScript
+│  └─ package.json # scripts: test:ci, lint, format
+├─ frontend/       # Vite + React + TypeScript
+│  └─ package.json # scripts: test:ci, lint, format, build
+├─ docker-compose.yml
+├─ .gitlab-ci.yml
+└─ ... (config files: ESLint, Prettier, etc.)
 
-## Suggestions for a good README
+```
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+## 💻 **2) How to run things (summary)**
 
-## Name
+### Requirements
 
-Choose a self-explaining name for your project.
+- **Docker & Docker Compose**
+- (Optional) **Node.js 20+** (only if you want to run local commands without Docker)
 
-## Description
+### Run the app (Docker, full stack)
 
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+```bash
+docker-compose up --build
 
-## Badges
+```
 
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+- Backend → [http://localhost:3000](http://localhost:3000)
+- Frontend → [http://localhost:5173](http://localhost:5173) (or your Nginx port)
+- PocketBase → [http://localhost:8090](http://localhost:8090)
+- PostgreSQL → port 5432 (via `db` service)
 
-## Visuals
+> 💡 If you change code, restart the affected container(s) or re-run `docker-compose up --build`.
 
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+### Run checks locally (quick commands)
 
-## Installation
+**Backend**
 
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+```bash
+cd backend
+npm ci
+npm run lint
+npm run format:check
+npm run test:ci
+```
 
-## Usage
+**Frontend**
 
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+```bash
+cd frontend
+npm ci
+npm run lint
+npm run format:check
+npm run test:ci
+npm run build
+```
 
-## Support
+**Lighthouse (frontend)**
 
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+```bash
+cd frontend
+npm ci && npm run build
+npm i -g @lhci/cli
+export CHROME_PATH=/usr/bin/chromium
+lhci autorun
+```
 
-## Roadmap
+Outputs are written under `frontend/.lighthouseci/`. The report link is printed in the console.
 
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+**Security (optional)**
 
-## Contributing
+```bash
+# secrets
+docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:latest \
+  detect --no-git -v --redact --source /repo
 
-State if you are open to contributions and what your requirements are for accepting them.
+# deps vulns
+docker run --rm -v "$PWD:/project" aquasec/trivy:latest \
+  fs --exit-code 1 --severity HIGH,CRITICAL --ignore-unfixed /project
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+# SAST
+docker run --rm -v "$PWD:/src" returntocorp/semgrep:latest \
+  semgrep ci --config p/ci --metrics=off --cwd /src
+```
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+## 🧰 **3) NPM scripts reference**
 
-## Authors and acknowledgment
+### Backend `package.json`
 
-Show your appreciation to those who have contributed to the project.
+```json
+{
+  "scripts": {
+    "dev": "nodemon src/server.ts",
+    "test": "jest --watchAll --verbose",
+    "test:ci": "jest --ci --verbose --coverage",
+    "lint": "eslint .",
+    "format:check": "prettier --check .",
+    "format:write": "prettier --write ."
+  }
+}
+```
 
-## License
+### Frontend `package.json`
 
-For open source projects, say how it is licensed.
+```json
+{
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest",
+    "lint": "eslint .",
+    "format:check": "prettier --check .",
+    "format:write": "prettier --write .",
+    "test:ci": "vitest run --coverage.enabled --coverage.reporter=lcov"
+  }
+}
+```
 
-## Project status
+## 🚦 **3) What the CI pipeline does (plain-English)**
 
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+The GitLab pipeline has **five stages**: `security` → `lint` → `test` → `quality` → `build`.  
+Each job runs in a clean container and fails the pipeline if an issue is found.
+
+### 🔐 Stage: SECURITY
+
+**Goal:** catch risky stuff ASAP.
+
+- **`secrets_scan` (Gitleaks)**  
+  Finds accidentally-committed **secrets** (API keys, tokens, passwords).  
+  👉 Fails if something that looks like a secret is found.
+
+- **`deps_vuln_scan` (Trivy)**  
+  Scans dependencies for **known vulnerabilities** (HIGH/CRITICAL).  
+  👉 Fails if vulnerable packages are detected.
+
+- **`sast_semgrep` (Semgrep)**  
+  Runs **static analysis** for common security pitfalls in JS/TS.  
+  👉 Fails if risky code patterns are detected.
+
+### 🧹 Stage: LINT
+
+**Goal:** maintain code style and readability.
+
+- **`backend_lint_format`** → checks backend code with **ESLint** & **Prettier**.
+- **`frontend_lint_format`** → checks frontend code for lint errors & formatting drift.
+
+👉 Both fail if the code doesn’t respect rules or formatting.
+
+### 🧪 Stage: TEST
+
+**Goal:** ensure code behaves correctly.
+
+- **`backend_tests`** → runs `jest` in CI mode, collects coverage (`lcov.info`).
+- **`frontend_tests`** → runs `vitest` in CI mode, collects coverage (`lcov.info`).
+
+👉 Both fail if tests fail. Coverage reports feed SonarQube.
+
+### 💡 Stage: QUALITY
+
+**Goal:** measure performance, accessibility, and deeper code quality.
+
+- **`lighthouse_ci`** → builds frontend and runs **Lighthouse** 3×.  
+  Checks **Performance**, **Accessibility**, **Best Practices**, and **SEO**.
+
+- **`sonarqube_backend`** → analyzes backend (bugs, smells, coverage, duplications).
+- **`sonarqube_frontend`** → same for frontend.
+
+👉 Results appear in SonarCloud/SonarQube dashboards.
+
+### 🏗️ Stage: BUILD
+
+**Goal:** confirm both apps build into Docker images.
+
+- **`backend_build`** → builds Docker image from `./backend`.
+- **`frontend_build`** → builds Docker image from `./frontend`.
+
+👉 Ensures your code is deployable.
+
+---
+
+## 🚀 **4) When the CI runs**
+
+- **On push to `main` or `dev`** → full pipeline runs.
+- **On Merge Requests** → same checks run to validate incoming changes.
+- **Artifacts** (Lighthouse reports, coverage) are attached to jobs.
+
+---
+
+## 🧭 **5) Troubleshooting tips**
+
+| Issue                       | Likely Cause / Fix                                                             |
+| --------------------------- | ------------------------------------------------------------------------------ |
+| Lighthouse shows NaN scores | Ensure frontend `dist/index.html` renders content; confirm Chrome path.        |
+| Sonar coverage = 0          | Make sure test jobs run **before** Sonar and paths to `lcov.info` are correct. |
+| Many Semgrep/Trivy alerts   | Start by fixing HIGH/CRITICAL ones; tune rules later.                          |
+
+---
+
+## 🧩 **6) Why these checks matter**
+
+| Check               | Purpose                                          |
+| ------------------- | ------------------------------------------------ |
+| 🔐 Secrets Scan     | Prevents leaking tokens/API keys in commits      |
+| 🧱 Dependency Vulns | Detects known security flaws in libraries        |
+| 🕵️‍♂️ SAST (Semgrep)   | Finds insecure code patterns                     |
+| 🧹 Lint/Format      | Keeps code readable, avoids small bugs           |
+| 🧪 Unit Tests       | Ensures logic works as expected                  |
+| ⚡ Lighthouse       | Measures performance, a11y, SEO & best practices |
+| 📊 SonarQube        | Tracks bugs, smells, duplications, coverage      |
+| 🐳 Docker Builds    | Confirms your app actually builds & runs         |
+
+---
+
+<p align="center">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/GitLab_logo.svg" height="50" alt="GitLab" />
+  &nbsp;&nbsp;&nbsp;
+  <img src="https://upload.wikimedia.org/wikipedia/commons/9/94/Node.js_logo.svg" height="50" alt="Node.js" />
+  &nbsp;&nbsp;&nbsp;
+  <img src="https://vitejs.dev/logo.svg" height="50" alt="Vite" />
+  &nbsp;&nbsp;&nbsp;
+  <img src="https://sonarcloud.io/images/sonarcloud-logo.svg" height="50" alt="SonarCloud" />
+  &nbsp;&nbsp;&nbsp;
+  <img src="https://grafana.com/static/assets/img/logos/logo-lighthouse.svg" height="50" alt="Lighthouse" />
+</p>
+
+---
+
+> 📘 **Summary:** This setup ensures that every commit is scanned, tested, analyzed, and proven buildable before it’s merged — protecting both **code quality** and **project security**.
