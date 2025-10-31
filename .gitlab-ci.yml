@@ -41,6 +41,7 @@ sast_semgrep:
     entrypoint: [""]
   before_script:
     - ln -s "$CI_PROJECT_DIR" /src || true
+    - cd /src
   script:
     - semgrep scan --config p/ci --metrics=off
   rules:
