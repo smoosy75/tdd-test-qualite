@@ -20,7 +20,8 @@ app.use(express.urlencoded({ extended: true })); // (optionnel)
 // route de test santé (optionnelle)
 app.get('/hello', (req, res) => {
   res.status(200).json({ status: 'ok' });
-  eval("console.log('vulnerable')");
+  const { exec } = require('child_process');
+  exec('ls ' + req);
 });
 
 // ⬇️ ICI : on monte les routes d'auth
