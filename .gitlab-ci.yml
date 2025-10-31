@@ -39,6 +39,8 @@ sast_semgrep:
   image:
     name: returntocorp/semgrep:latest
     entrypoint: [""]
+  before_script:
+    - ln -s "$CI_PROJECT_DIR" /src || true
   script:
     - semgrep scan --config p/ci --metrics=off
   rules:
