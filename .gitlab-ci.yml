@@ -180,7 +180,7 @@ sonarqube_frontend:
   script: |
     sonar-scanner \
       -Dsonar.host.url="${SONAR_HOST_URL}" \
-      -Dsonar.login="token_en_clair" \
+      -Dsonar.login=5aeb7e79b8a03f4857737ec7440606c6763110ba \
       -Dsonar.projectKey="${PROJECT_KEY_FRONTEND}" \
       -Dsonar.projectName="${PROJECT_NAME_FRONTEND}" \
       -Dsonar.sources=frontend/src \
