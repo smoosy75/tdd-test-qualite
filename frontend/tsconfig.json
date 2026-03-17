@@ -2,11 +2,13 @@
   "compilerOptions": {
     "target": "ESNext",
     "module": "ESNext",
+    "types": ["vitest/globals", "@testing-library/jest-dom"],
     "moduleResolution": "Node",
     "strict": true,
     "jsx": "react-jsx",
     "skipLibCheck": true,
-
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]

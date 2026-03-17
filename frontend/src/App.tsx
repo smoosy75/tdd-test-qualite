@@ -1,28 +1,27 @@
-import { useEffect, useState } from "react";
-import { Routes, Route } from "react-router-dom";
-
-import LoginPage from "@/pages/loginPage.tsx";
+import { Routes, Route } from 'react-router-dom';
+import PostsList from '@/components/PostsList';
+import PostDetail from '@/components/PostDetail';
+import Navbar from '@/components/navbar';
+import { useAuthRedirect } from './hooks/useAuthRedirect';
+import LoginPage from '@/pages/loginPage';
+import ProfilePage from './pages/profilPage.tsx/profilPage';
+import HomePage from './pages/HomePage.js';
 
 function App() {
-  const [status, setStatus] = useState("checking...");
-
-  useEffect(() => {
-    fetch("http://localhost:3000/hello")
-      .then((res) => res.json())
-      .then((data) => setStatus(data.status))
-      .catch(() => setStatus("offline"));
-  }, []);
+  useAuthRedirect();
 
   return (
-    <div style={{ textAlign: "center", marginTop: "30px" }}>
-      <h1>Forum TDD</h1>
-      <p>Backend status: {status}</p>
-
+    <>
+      <Navbar />
       <Routes>
+        <Route path="/" element={<PostsList />} />
+        <Route path="/home" element={<HomePage />} />
+        <Route path="/posts" element={<PostsList />} />
+        <Route path="/posts/:id" element={<PostDetail />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
       </Routes>
-    </div>
+    </>
   );
 }
-
 export default App;

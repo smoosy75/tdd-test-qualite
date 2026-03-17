@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     /* === Environnement Node === */
-    "target": "ES2020",
-    "module": "CommonJS",
+    "target": "ES2022",
+    "module": "esnext",
     "moduleResolution": "node",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
@@ -17,8 +17,14 @@
     /* === Autres === */
     "forceConsistentCasingInFileNames": true,
     "sourceMap": true,
-    "noImplicitAny": false
+    "noImplicitAny": false,
+    "typeRoots": ["./node_modules/@types", "./src/types"]
   },
+  "ts-node": {
+    "esm": true,
+    "experimentalSpecifierResolution": "node"
+  },
+  "lib": ["esnext"],
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "dist"]
 }
