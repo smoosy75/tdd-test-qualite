@@ -6,5 +6,10 @@ export default tseslint.config(
   ...tseslint.configs.recommended,
   {
     ignores: ["node_modules/**", "coverage/**", "dist/**"],
+  },
+  {
+    rules: {
+      "@typescript-eslint/no-explicit-any": "warn",
+    },
   }
 );
