@@ -1,4 +1,4 @@
-import PocketBase from "pocketbase";
+import PocketBase from 'pocketbase';
 
 const pb = new PocketBase(process.env.POCKETBASE_URL);
 
