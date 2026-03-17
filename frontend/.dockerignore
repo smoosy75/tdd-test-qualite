@@ -5,13 +5,15 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-.env
-.env.*
-
 # Git
 .git/
 .gitignore
 .gitattributes
+
+# Environment variables
+.env
+.env.*
+!.env.example
 
 # Build output
 dist/
