@@ -1,0 +1,247 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+
+jobs:
+  # ─────────────────────────────────────────────
+  # SECURITY
+  # ─────────────────────────────────────────────
+  secrets_scan:
+    name: Secrets Scan (Gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  deps_vuln_scan:
+    name: Dependency Vulnerability Scan (Trivy)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: fs
+          scan-ref: .
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: 1
+
+  sast_semgrep:
+    name: SAST (Semgrep)
+    runs-on: ubuntu-latest
+    container:
+      image: returntocorp/semgrep
+    steps:
+      - uses: actions/checkout@v4
+      - run: semgrep ci --config p/ci --metrics=off
+
+  # ─────────────────────────────────────────────
+  # LINT
+  # ─────────────────────────────────────────────
+  backend_lint_format:
+    name: Backend Lint & Format
+    runs-on: ubuntu-latest
+    needs: [secrets_scan, deps_vuln_scan, sast_semgrep]
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - run: npm ci --no-audit --no-fund
+      - run: npm run lint
+      - run: npm run format:check
+
+  frontend_lint_format:
+    name: Frontend Lint & Format
+    runs-on: ubuntu-latest
+    needs: [secrets_scan, deps_vuln_scan, sast_semgrep]
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci --no-audit --no-fund
+      - run: npm run lint
+      - run: npm run format:check
+
+  # ─────────────────────────────────────────────
+  # TEST
+  # ─────────────────────────────────────────────
+  backend_tests:
+    name: Backend Tests (Jest)
+    runs-on: ubuntu-latest
+    needs: [backend_lint_format]
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      NODE_ENV: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - run: npm ci --no-audit --no-fund
+      - run: npm run test:ci
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-coverage
+          path: backend/coverage/lcov.info
+
+  frontend_tests:
+    name: Frontend Tests (Vitest)
+    runs-on: ubuntu-latest
+    needs: [frontend_lint_format]
+    defaults:
+      run:
+        working-directory: frontend
+    env:
+      NODE_ENV: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci --no-audit --no-fund
+      - run: npm run test:ci
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: frontend-coverage
+          path: frontend/coverage/lcov.info
+
+  # ─────────────────────────────────────────────
+  # QUALITY
+  # ─────────────────────────────────────────────
+  lighthouse_ci:
+    name: Lighthouse CI
+    runs-on: ubuntu-latest
+    needs: [frontend_tests]
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci --no-audit --no-fund
+      - run: npm run build
+      - run: npm install -g @lhci/cli
+      - name: Run Lighthouse CI
+        run: lhci autorun
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lighthouse-report
+          path: frontend/.lighthouseci
+
+  sonarqube_backend:
+    name: SonarQube Backend
+    runs-on: ubuntu-latest
+    needs: [backend_tests]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/download-artifact@v4
+        with:
+          name: backend-coverage
+          path: backend/coverage
+      - uses: SonarSource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        with:
+          args: >
+            -Dsonar.projectKey=${{ secrets.PROJECT_KEY_BACKEND }}
+            -Dsonar.projectName=${{ secrets.PROJECT_NAME_BACKEND }}
+            -Dsonar.sources=backend/src
+            -Dsonar.tests=backend/src
+            -Dsonar.test.inclusions=**/*.test.*,**/*.spec.*
+            -Dsonar.javascript.lcov.reportPaths=backend/coverage/lcov.info
+            -Dsonar.typescript.tsconfigPaths=backend/tsconfig.json
+
+  sonarqube_frontend:
+    name: SonarQube Frontend
+    runs-on: ubuntu-latest
+    needs: [frontend_tests]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/download-artifact@v4
+        with:
+          name: frontend-coverage
+          path: frontend/coverage
+      - uses: SonarSource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        with:
+          args: >
+            -Dsonar.projectKey=${{ secrets.PROJECT_KEY_FRONTEND }}
+            -Dsonar.projectName=${{ secrets.PROJECT_NAME_FRONTEND }}
+            -Dsonar.sources=frontend/src
+            -Dsonar.tests=frontend/src
+            -Dsonar.test.inclusions=**/*.test.*,**/*.spec.*
+            -Dsonar.javascript.lcov.reportPaths=frontend/coverage/lcov.info
+            -Dsonar.typescript.tsconfigPaths=frontend/tsconfig.json
+
+  # ─────────────────────────────────────────────
+  # BUILD
+  # ─────────────────────────────────────────────
+  backend_build:
+    name: Build Backend Docker Image
+    runs-on: ubuntu-latest
+    needs: [backend_tests]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Build backend image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          push: false
+          tags: backend:${{ github.sha }}
+
+  frontend_build:
+    name: Build Frontend Docker Image
+    runs-on: ubuntu-latest
+    needs: [frontend_tests]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Build frontend image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          push: false
+          tags: frontend:${{ github.sha }}
