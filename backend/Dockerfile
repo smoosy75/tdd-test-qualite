@@ -2,12 +2,12 @@ FROM node:25-bookworm-slim
 
 WORKDIR /app
 
-COPY package.json yarn.lock ./
+COPY package.json package-lock.json ./
 
-RUN yarn install --frozen-lockfile
+RUN npm ci --no-audit --no-fund
 
-COPY . .    
+COPY . .
 
 EXPOSE 3000
 
-CMD ["yarn", "run", "dev"]
+CMD ["npm", "run", "dev"]
