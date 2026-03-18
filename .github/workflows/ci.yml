@@ -183,13 +183,6 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        with:
-          args: >
-            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
-            -Dsonar.sources=backend/src,frontend/src
-            -Dsonar.tests=backend/src,frontend/src
-            -Dsonar.test.inclusions=**/*.test.*,**/*.spec.*
-            -Dsonar.javascript.lcov.reportPaths=backend/coverage/lcov.info,frontend/coverage/lcov.info
 
   # ─────────────────────────────────────────────
   # BUILD
